@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "896682256426",
+    "project_id": "okoagirl",
+    "storage_bucket": "okoagirl.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:896682256426:android:0c80ac186af554a038bb53",
+        "android_client_info": {
+          "package_name": "com.ghost.okoagirl"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "896682256426-1agj5r1gfg95etrdbjbah9cstcgfsg2h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCz1xE-A-pgz6B36IYWrEWDdeqTCkNAJfc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "896682256426-1agj5r1gfg95etrdbjbah9cstcgfsg2h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
