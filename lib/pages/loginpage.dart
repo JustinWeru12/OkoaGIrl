@@ -685,7 +685,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
                   _showLogo(size),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 20.0),
-                    child: Text("Welcome to Okoa Girl",
+                    child: Text("Welcome to Okoa Girl Child",
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 25,

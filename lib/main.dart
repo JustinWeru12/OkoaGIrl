@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       DeviceOrientation.portraitUp,
     ]);
     return MaterialApp(
-      title: 'Okoa Girl',
+      title: 'Okoa Girl Child',
       initialRoute: '/',
       debugShowCheckedModeBanner: false,
       navigatorKey: _navigatorKey,

@@ -109,7 +109,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
                             SizedBox(height: 30.0),
                             Text(
-                              'Okoa Girl',
+                              'Okoa Girl Child',
                               style: kBoardingTextStyle,
                               textAlign: TextAlign.center,
                             ),
