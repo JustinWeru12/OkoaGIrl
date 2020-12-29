@@ -1,4 +1,5 @@
 import 'package:okoagirl/constants/constants.dart';
+import 'package:okoagirl/pages/adminpanel.dart';
 import 'package:okoagirl/pages/donate.dart';
 import 'package:okoagirl/pages/help.dart';
 import 'package:okoagirl/pages/profile.dart';
@@ -47,8 +48,6 @@ class _SideBarState extends State<SideBar> {
         userMail = dataMap['email'];
         _fullNames = dataMap['fullNames'];
         profilPicture = dataMap['picture'];
-        isDriver = dataMap['isDriver'];
-        isSeller = dataMap['isSeller'];
         isAdmin = dataMap['admin'];
       });
     });
@@ -62,7 +61,9 @@ class _SideBarState extends State<SideBar> {
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(0.0),
             color: kBackgroundColor,
-            image: DecorationImage(image: AssetImage('assets/images/bg.png'),fit: BoxFit.cover)),
+            // image: DecorationImage(
+            //     image: AssetImage('assets/images/bg.png'), fit: BoxFit.cover),
+                ),
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -130,16 +131,30 @@ class _SideBarState extends State<SideBar> {
                       Navigator.pushReplacementNamed(context, '/'),
                     },
                   ),
+                  isAdmin ? divider() : Container(),
+                  isAdmin
+                      ? ListTile(
+                          leading: Icon(Icons.admin_panel_settings_rounded, color: kTextColor),
+                          title: Text('Admin',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          onTap: () => {
+                            Navigator.of(context).pop(),
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AdminPanel()))
+                          },
+                        )
+                      : Container(),
                   divider(),
                   ListTile(
                     leading: Icon(Icons.report, color: kTextColor),
                     title: Text('Report',
                         style: TextStyle(fontWeight: FontWeight.bold)),
                     onTap: () => {
-                      Navigator.of(context).pop(), Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ReportPage()))
+                      Navigator.of(context).pop(),
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => ReportPage()))
                     },
                   ),
                   divider(),
@@ -148,10 +163,9 @@ class _SideBarState extends State<SideBar> {
                     title: Text('Donate',
                         style: TextStyle(fontWeight: FontWeight.bold)),
                     onTap: () => {
-                      Navigator.of(context).pop(), Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => DonatePage()))
+                      Navigator.of(context).pop(),
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => DonatePage()))
                     },
                   ),
                   divider(),

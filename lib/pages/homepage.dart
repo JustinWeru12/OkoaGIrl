@@ -101,7 +101,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   _buildTabTile(
                       'Report',
-                      "Repoprt any Gender Based discrimination that you or a female friend is going through and our experts will help you work towards a solution.",
+                      "Report any Gender Based discrimination that you or a female friend is going through and our experts will help you work towards a solution.",
                       ReportPage()),
                   _buildTabTile(
                       'Donate',

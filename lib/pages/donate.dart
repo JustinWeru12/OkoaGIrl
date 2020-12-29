@@ -36,7 +36,7 @@ class _DonatePageState extends State<DonatePage> {
   ];
   List<int> prices = [], tips = [50, 100, 200, 500, 1000, 0];
   CrudMethods crudObj = new CrudMethods();
-  String greetingMes, _fullName = " ", _userId, image;
+  String greetingMes, _fullName = " ", image;
   bool isAdmin;
   String greetingMessage() {
     var timeNow = DateTime.now().hour;
@@ -73,7 +73,6 @@ class _DonatePageState extends State<DonatePage> {
       setState(() {
         _fullName = dataMap['fullNames'];
         isAdmin = dataMap['admin'];
-        _userId = dataMap['userId'];
       });
     });
     super.initState();

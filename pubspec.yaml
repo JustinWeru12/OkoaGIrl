@@ -42,6 +42,8 @@ dependencies:
   font_awesome_flutter: ^8.10.0
   transparent_image: ^1.0.0
   carousel_slider: ^2.3.1
+  location: ^3.0.2
+  geoflutterfire: ^2.2.1
 
 dev_dependencies:
   flutter_test:
