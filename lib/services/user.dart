@@ -10,8 +10,7 @@ class UserData {
   final String phone;
   final String picture;
   final String address;
-  final String product;
-  final bool admin, isDriver, isSeller;
+  final bool admin, isHealth, isLegal;
   UserData(
       {this.userId,
       this.fullNames,
@@ -19,10 +18,9 @@ class UserData {
       this.phone,
       this.address,
       this.picture,
-      this.product,
       this.admin,
-      this.isDriver,
-      this.isSeller});
+      this.isHealth,
+      this.isLegal});
 
   Map<String, dynamic> getDataMap() {
     return {
@@ -33,9 +31,8 @@ class UserData {
       "address": address,
       "picture": picture,
       "admin": admin,
-      "isDriver": isDriver,
-      "isSeller": isSeller,
-      "product": product,
+      "isHealth": isHealth,
+      "isLegal": isLegal
     };
   }
 }

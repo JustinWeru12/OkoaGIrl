@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:okoagirl/constants/constants.dart';
+import 'package:okoagirl/pages/addItems.dart';
 import 'package:okoagirl/pages/sidebar.dart';
 import 'package:okoagirl/services/authentication.dart';
 import 'package:okoagirl/services/crud.dart';
@@ -30,7 +31,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String userMail = 'userMail';
   String profilPicture, _phone;
   String _fullNames;
-  bool isSeller = false, isDriver = false;
+  bool isHealth = false, isLegal = false;
   final _formKey = GlobalKey<FormState>();
 
   void initState() {
@@ -51,8 +52,8 @@ class _ProfilePageState extends State<ProfilePage> {
       setState(() {
         _fullNames = dataMap['fullNames'];
         profilPicture = dataMap['picture'];
-        isSeller = dataMap['isSeller'];
-        isDriver = dataMap['isDriver'];
+        isHealth = dataMap['isHealth'];
+        isLegal = dataMap['isLegal'];
       });
     });
   }
@@ -368,6 +369,95 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _addButton() {
+    return Container(
+      width: 300.0,
+      child: isHealth
+          ? RaisedButton(
+              onPressed: () {},
+              padding: EdgeInsets.all(0),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(5.0))),
+              child: Container(
+                padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5.0),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [kPrimaryColor, kSecondaryColor],
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    "Already Registered ",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16.0),
+                  ),
+                ),
+              ),
+            )
+          : isLegal
+              ? RaisedButton(
+                  onPressed: () {},
+                  padding: EdgeInsets.all(0),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                  child: Container(
+                    padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5.0),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [kPrimaryColor, kSecondaryColor],
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        "Already Register  ",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16.0),
+                      ),
+                    ),
+                  ),
+                )
+              : RaisedButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => AddProfile()));
+                  },
+                  padding: EdgeInsets.all(0),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                  child: Container(
+                    padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5.0),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [kPrimaryColor, kSecondaryColor],
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        "Register \nLegal/Health ",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16.0),
+                      ),
+                    ),
+                  ),
+                ),
     );
   }
 

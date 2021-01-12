@@ -82,6 +82,25 @@ class CrudMethods {
     });
   }
 
+  getBudget() async {
+    return FirebaseFirestore.instance
+        .collection('finances')
+        .doc('budget')
+        .get();
+  }
+
+  Future<void> updateDueList(data) async {
+    DocumentReference ref =
+        FirebaseFirestore.instance.collection("finances").doc("budget");
+    return ref.set({"budget": data}, SetOptions(merge: true));
+  }
+
+  Future<void> updatePaidList(data) async {
+    DocumentReference ref =
+        FirebaseFirestore.instance.collection("finances").doc("budget");
+    return ref.set({"donations": data}, SetOptions(merge: true));
+  }
+
   getDeveloperData() async {
     return await FirebaseFirestore.instance
         .collection('res')

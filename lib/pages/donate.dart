@@ -25,7 +25,7 @@ class DonatePage extends StatefulWidget {
 
 class _DonatePageState extends State<DonatePage> {
   int tip = 0;
-  bool customTip = false, more = false, anonym = false;
+  bool customTip = true, more = false, anonym = false;
   List<String> tipPic = [
     'assets/icons/cookie.png',
     'assets/icons/cup.png',
@@ -35,13 +35,16 @@ class _DonatePageState extends State<DonatePage> {
     'assets/icons/present.png',
   ];
   List<int> prices = [], tips = [50, 100, 200, 500, 1000, 0];
+  List<int> amounts = [];
   CrudMethods crudObj = new CrudMethods();
   String greetingMes, _fullName = " ", image;
   bool isAdmin;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   String greetingMessage() {
     var timeNow = DateTime.now().hour;
 
-    if (timeNow <= 12) {
+    if ((timeNow > 3) && (timeNow <= 12)) {
       return 'Good Morning';
     } else if ((timeNow > 12) && (timeNow <= 16)) {
       return 'Good Afternoon';
@@ -64,6 +67,18 @@ class _DonatePageState extends State<DonatePage> {
     }
   }
 
+  showInSnackBar(value) {
+    _scaffoldKey.currentState.showSnackBar(new SnackBar(
+      content: new Text(
+        value,
+        style: TextStyle(fontSize: 20, color: Colors.white),
+        textAlign: TextAlign.center,
+      ),
+      backgroundColor: Theme.of(context).accentColor,
+      duration: new Duration(milliseconds: 1500),
+    ));
+  }
+
   @override
   void initState() {
     greetingMes = greetingMessage();
@@ -78,10 +93,26 @@ class _DonatePageState extends State<DonatePage> {
     super.initState();
   }
 
+    addDonation() {
+    Map<String, dynamic> budgetData = {
+      "name": _fullName,
+      "amount": tip,
+      "desc": '',
+    };
+    crudObj.getBudget().then((value) {
+      Map<String, dynamic> dataMap = value.data();
+      crudObj.updatePaidList(dataMap['donations'] ?? []
+        ..addAll([tip]));
+    });
+
+    crudObj.createDonation(budgetData);
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
+        key: _scaffoldKey,
         drawer: SideBar(
           logoutCallback: widget._signOut,
         ),
@@ -140,10 +171,13 @@ class _DonatePageState extends State<DonatePage> {
                           child: Text(
                             "$greetingMes, " +
                                 _fullName.substring(0, _fullName.indexOf(' ')),
-                            style: Theme.of(context).textTheme.headline3.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: kTextColor,
-                                fontSize: 20),
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline3
+                                .copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: kTextColor,
+                                    fontSize: 20),
                           ),
                         ),
                         SizedBox(height: 20),
@@ -304,7 +338,18 @@ class _DonatePageState extends State<DonatePage> {
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white)),
-                            onPressed: () {},
+                            onPressed: () {
+                              if (customTip) {
+                                if (_formKey.currentState.validate()) {
+                                  _formKey.currentState.save();
+                                  addDonation();
+                                  showInSnackBar("Donation Made");
+                                }
+                              } else {
+                                addDonation();
+                                showInSnackBar("Donation Made");
+                              }
+                            },
                           ),
                         ),
                       ],
@@ -318,42 +363,45 @@ class _DonatePageState extends State<DonatePage> {
   }
 
   Widget _buildTipField() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 10.0, 0.0),
-      child: TextFormField(
-        maxLines: 1,
-        initialValue: '100',
-        keyboardType: TextInputType.number,
-        key: new Key('tip'),
-        decoration: InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(15.0, 0.0, 10.0, 0.0),
-          labelText: 'CustomTip',
-          hintText: '100',
-          hintStyle: kSubTextStyle,
-          labelStyle: kSubTextStyle,
-          prefixIcon: new Icon(
-            Icons.phone,
-            color: kSecondaryColor,
+    return Form(
+      key: _formKey,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(0.0, 15.0, 10.0, 0.0),
+        child: TextFormField(
+          maxLines: 1,
+          initialValue: '100',
+          keyboardType: TextInputType.number,
+          key: new Key('tip'),
+          decoration: InputDecoration(
+            contentPadding: EdgeInsets.fromLTRB(15.0, 0.0, 10.0, 0.0),
+            labelText: 'CustomTip',
+            hintText: '100',
+            hintStyle: kSubTextStyle,
+            labelStyle: kSubTextStyle,
+            prefixIcon: new Icon(
+              Icons.phone,
+              color: kSecondaryColor,
+            ),
+            border: new OutlineInputBorder(
+              borderRadius: new BorderRadius.circular(42),
+              borderSide: new BorderSide(),
+            ),
+            filled: true,
+            fillColor: kBackgroundColor.withOpacity(0.75),
           ),
-          border: new OutlineInputBorder(
-            borderRadius: new BorderRadius.circular(42),
-            borderSide: new BorderSide(),
-          ),
-          filled: true,
-          fillColor: kBackgroundColor.withOpacity(0.75),
+          validator: (value) {
+            if (value.isEmpty) {
+              return 'Enter a valid Amount';
+            }
+            return null;
+          },
+          onSaved: (value) {
+            tip = int.tryParse(value);
+          },
+          onChanged: (value) {
+            tip = int.tryParse(value);
+          },
         ),
-        validator: (value) {
-          if (value.isEmpty) {
-            return 'Enter a valid Amount';
-          }
-          return null;
-        },
-        onSaved: (value) {
-          tip = int.tryParse(value);
-        },
-        onChanged: (value) {
-          tip = int.tryParse(value);
-        },
       ),
     );
   }
@@ -361,7 +409,7 @@ class _DonatePageState extends State<DonatePage> {
   Widget budget() {
     return StreamBuilder(
       stream: FirebaseFirestore.instance
-          .collection('budget')
+          .collection('finances')
           .doc('budget')
           .snapshots(),
       builder: (context, snapshot) {
@@ -369,6 +417,12 @@ class _DonatePageState extends State<DonatePage> {
           return CircularProgressIndicator();
         }
         var userData = snapshot.data;
+        int budget = userData['budget']
+            .fold(0, (previous, current) => previous + current);
+        int donation = userData['donations'] != null
+            ? userData['donations']
+                .fold(0, (previous, current) => previous + current)
+            : 0;
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Container(
@@ -389,18 +443,22 @@ class _DonatePageState extends State<DonatePage> {
               children: <Widget>[
                 Counter(
                   color: kInfectedColor,
-                  number: userData['budget'],
+                  number: budget ?? 0,
                   title: "Budget",
                 ),
                 Counter(
                   color: kDeathColor,
-                  number: userData['donated'],
+                  number: !snapshot.hasError ? donation : 0,
                   title: "Donations",
                 ),
                 Counter(
                   color: kRecovercolor,
-                  number: userData['budget'] - userData['donated'],
-                  title: "Remainder",
+                  number: !snapshot.hasError
+                      ? budget < donation
+                          ? (donation - budget)
+                          : (budget - donation)
+                      : 0,
+                  title: budget > donation ? "Remainder" : "Surplus",
                 ),
               ],
             ),

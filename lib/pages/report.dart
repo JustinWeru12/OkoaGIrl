@@ -32,7 +32,7 @@ class ReportPage extends StatefulWidget {
 class _ReportPageState extends State<ReportPage> {
   bool more = false, anonym = false;
   CrudMethods crudObj = new CrudMethods();
-  String greetingMes, _fullName = " ", _userId, image;
+  String greetingMes, _fullName = " ", image;
   bool isAdmin;
   String victimName,
       phone,
@@ -97,7 +97,6 @@ class _ReportPageState extends State<ReportPage> {
       setState(() {
         _fullName = dataMap['fullNames'];
         isAdmin = dataMap['admin'];
-        _userId = dataMap['userId'];
       });
     });
     super.initState();

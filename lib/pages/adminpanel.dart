@@ -15,14 +15,61 @@ class _AdminPanelState extends State<AdminPanel> {
   var email = TextEditingController();
   var profid = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  String image, userDataId = '', description, name;
+  String image, userDataId = '', description, name, budgetName, budgetDesc;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final picker = ImagePicker();
+  int budgetAmt;
   CrudMethods crudObj = CrudMethods();
   List<String> list = [];
+  List budget;
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  addBudget() {
+    Map<String, dynamic> budgetData = {
+      "name": budgetName,
+      "amount": budgetAmt,
+      "desc": budgetDesc,
+    };
+    crudObj.getBudget().then((value) {
+      Map<String, dynamic> dataMap = value.data();
+      crudObj.updateDueList(dataMap['budget'] ?? []
+        ..addAll([budgetAmt]));
+    });
+
+    crudObj.createBudget(budgetData);
+  }
+
+  showInSnackBar(value) {
+    _scaffoldKey.currentState.showSnackBar(new SnackBar(
+      content: new Text(
+        value,
+        style: TextStyle(fontSize: 20, color: Colors.white),
+        textAlign: TextAlign.center,
+      ),
+      backgroundColor: Theme.of(context).accentColor,
+      duration: new Duration(milliseconds: 1500),
+    ));
+  }
+
+  _getBudget() {
+    crudObj.getBudget().then((value) {
+      Map<String, dynamic> dataMap = value.data();
+      setState(() {
+        budget = dataMap['budget'] ?? [];
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getBudget();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: new AppBar(
         title: Text(
           'Panel',
@@ -48,6 +95,21 @@ class _AdminPanelState extends State<AdminPanel> {
             ),
             CustomDivider(),
             DashBoard(),
+            SizedBox(height: 10),
+            Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: Text(
+                    "Our Budget",
+                    style: kTitleTextstyle.copyWith(
+                        fontSize: 20, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            ),
+            CustomDivider(),
+            budgetTab(),
             SizedBox(height: 10),
             Padding(
               padding:
@@ -76,6 +138,57 @@ class _AdminPanelState extends State<AdminPanel> {
                   child: _adminButton(context)),
             ),
             SizedBox(height: 10),
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4),
+              child: Text(
+                "ADD.",
+                style: kHeadingTextStyle,
+              ),
+            ),
+            CustomDivider(),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                padding: EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      offset: Offset(0, 4),
+                      blurRadius: 30,
+                      color: kTextColor,
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+                  child: InkWell(
+                    onTap: () {
+                      _addBudget(context);
+                    },
+                    child: Container(
+                      height: 40.0,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: kSecondaryColor),
+                      ),
+                      child: Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: Text(
+                            "ADD BUDGET",
+                            style: TextStyle(
+                                color: kSecondaryColor,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -172,6 +285,68 @@ class _AdminPanelState extends State<AdminPanel> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget budgetTab() {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection('finances')
+          .doc('budget')
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return CircularProgressIndicator();
+        }
+        var userData = snapshot.data;
+        int budget = userData['budget']
+            .fold(0, (previous, current) => previous + current);
+        int donation = userData['donations'] != null
+            ? userData['donations']
+                .fold(0, (previous, current) => previous + current)
+            : 0;
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  offset: Offset(0, 4),
+                  blurRadius: 30,
+                  color: kShadowColor,
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Counter(
+                  color: kInfectedColor,
+                  number: budget ?? 0,
+                  title: "Budget",
+                ),
+                Counter(
+                  color: kDeathColor,
+                  number: !snapshot.hasError ? donation : 0,
+                  title: "Donations",
+                ),
+                Counter(
+                  color: kRecovercolor,
+                  number: !snapshot.hasError
+                      ? budget < donation
+                          ? (donation - budget)
+                          : (budget - donation)
+                      : 0,
+                  title: budget > donation ? "Remainder" : "Surplus",
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -449,6 +624,168 @@ class _AdminPanelState extends State<AdminPanel> {
               ),
             ),
           );
+        });
+  }
+
+  void _addBudget(context) async {
+    Size size = MediaQuery.of(context).size;
+    return showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        isScrollControlled: false,
+        builder: (context) {
+          return StatefulBuilder(builder: (context, setState) {
+            return SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.only(
+                    top: 10,
+                    left: 30,
+                    right: 30,
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                width: size.width * 0.9,
+                // height: 300,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).canvasColor,
+                  borderRadius: BorderRadius.only(
+                    topLeft: const Radius.circular(25.0),
+                    topRight: const Radius.circular(25.0),
+                  ),
+                ),
+                child: SingleChildScrollView(
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              'Enter the Budget Information',
+                              style: TextStyle(
+                                  fontSize: 18.0,
+                                  fontFamily: 'Nexa',
+                                  fontWeight: FontWeight.bold,
+                                  fontStyle: FontStyle.normal),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: TextFormField(
+                                style: TextStyle(
+                                    fontSize: 16.0, color: Colors.black),
+                                autofocus: false,
+                                decoration: new InputDecoration(
+                                  contentPadding:
+                                      EdgeInsets.fromLTRB(15.0, 0.0, 10.0, 0.0),
+                                  labelText: 'Budget Item',
+                                  hintText: 'Sanitation',
+                                  hintStyle: TextStyle(
+                                      fontSize: 17.0,
+                                      fontStyle: FontStyle.italic),
+                                  border: new OutlineInputBorder(
+                                    borderRadius:
+                                        new BorderRadius.circular(5.0),
+                                    borderSide: new BorderSide(),
+                                  ),
+                                ),
+                                validator: (value) {
+                                  if (value.isEmpty)
+                                    return 'Please Enter an Item Name';
+                                  else {
+                                    return null; // print(_email);
+                                  }
+                                },
+                                onSaved: (value) => budgetName = value,
+                              )),
+                          Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: TextFormField(
+                                style: TextStyle(
+                                    fontSize: 16.0, color: Colors.black),
+                                autofocus: false,
+                                keyboardType: TextInputType.number,
+                                decoration: new InputDecoration(
+                                  contentPadding:
+                                      EdgeInsets.fromLTRB(15.0, 0.0, 10.0, 0.0),
+                                  labelText: 'Budget Amount',
+                                  hintText: '123',
+                                  hintStyle: TextStyle(
+                                      fontSize: 17.0,
+                                      fontStyle: FontStyle.italic),
+                                  border: new OutlineInputBorder(
+                                    borderRadius:
+                                        new BorderRadius.circular(5.0),
+                                    borderSide: new BorderSide(),
+                                  ),
+                                ),
+                                validator: (value) {
+                                  if (value.isEmpty)
+                                    return 'Please Enter an Amount';
+                                  else {
+                                    return null; // print(_email);
+                                  }
+                                },
+                                onSaved: (value) =>
+                                    budgetAmt = int.tryParse(value),
+                              )),
+                          Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: TextFormField(
+                                style: TextStyle(
+                                    fontSize: 16.0, color: Colors.black),
+                                autofocus: false,
+                                decoration: new InputDecoration(
+                                  contentPadding:
+                                      EdgeInsets.fromLTRB(15.0, 0.0, 10.0, 0.0),
+                                  labelText: 'Description',
+                                  hintStyle: TextStyle(
+                                      fontSize: 17.0,
+                                      fontStyle: FontStyle.italic),
+                                  border: new OutlineInputBorder(
+                                    borderRadius:
+                                        new BorderRadius.circular(5.0),
+                                    borderSide: new BorderSide(),
+                                  ),
+                                ),
+                                validator: (value) {
+                                  if (value.isEmpty)
+                                    return 'Please Enter a Description';
+                                  else {
+                                    return null; // print(_email);
+                                  }
+                                },
+                                onSaved: (value) => budgetDesc = value,
+                              )),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: RaisedButton(
+                                color: Theme.of(context).accentColor,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20.0)),
+                                child: Text(
+                                  'Add Budget',
+                                  style: TextStyle(
+                                      fontSize: 15.0,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                textColor: Colors.white,
+                                onPressed: () {
+                                  if (_formKey.currentState.validate()) {
+                                    _formKey.currentState.save();
+                                    addBudget();
+                                    showInSnackBar("Budget Added");
+                                  }
+                                  Navigator.of(context).pop();
+                                }),
+                          )
+                        ]),
+                  ),
+                ),
+              ),
+            );
+          });
         });
   }
 }

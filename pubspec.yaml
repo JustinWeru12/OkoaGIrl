@@ -44,6 +44,7 @@ dependencies:
   carousel_slider: ^2.3.1
   location: ^3.0.2
   geoflutterfire: ^2.2.1
+  geocoder: ^0.2.1
 
 dev_dependencies:
   flutter_test:

@@ -76,8 +76,8 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
             phone: "",
             picture:
                 "https://firebasestorage.googleapis.com/v0/b/enroute-25815.appspot.com/o/restaurant-red-beans-coffee.jpg?alt=media&token=a75145f8-1351-4335-bc75-432849dac887",
-            isDriver: false,
-            isSeller: false,
+            isHealth: false,
+            isLegal: false,
             admin: false,
           );
           crudObj.createOrUpdateUserData(userData.getDataMap());
@@ -89,8 +89,8 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
         //     phone: phoneNo,
         //     picture:
         //         "https://firebasestorage.googleapis.com/v0/b/enroute-25815.appspot.com/o/restaurant-red-beans-coffee.jpg?alt=media&token=a75145f8-1351-4335-bc75-432849dac887",
-        //     isDriver: false,
-        //     isSeller: false,
+        //     isHealth: false,
+        //     isLegal: false,
         //     admin: false,
         //   );
         //   crudObj.createOrUpdateUserData(userData.getDataMap());
@@ -551,8 +551,8 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
   //           email: value.email,
   //           phone: "",
   //           picture: value.photoUrl,
-  //           isDriver: false,
-  //           isSeller: false,
+  //           isHealth: false,
+  //           isLegal: false,
   //           admin: false,
   //         );
   //         crudObj.createOrUpdateUserData(userData.getDataMap());
