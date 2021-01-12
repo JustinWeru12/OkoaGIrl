@@ -275,10 +275,10 @@ class _AddProfileState extends State<AddProfile> {
       child: TextFormField(
         maxLines: 1,
         key: new Key('name'),
-        style: kContentTextstyle,
+        style: kFormTextstyle,
         decoration: InputDecoration(
           labelText: 'Full Name',
-          labelStyle: kContentTextstyle,
+          labelStyle: kFormTextstyle,
           icon: new Icon(
             FontAwesomeIcons.home,
             size: 24,
@@ -304,10 +304,10 @@ class _AddProfileState extends State<AddProfile> {
       child: TextFormField(
         maxLength: 200,
         key: new Key('description'),
-        style: kContentTextstyle,
+        style: kFormTextstyle,
         decoration: InputDecoration(
           labelText: 'Biography',
-          labelStyle: kContentTextstyle,
+          labelStyle: kFormTextstyle,
           icon: new Icon(
             FontAwesomeIcons.solidClipboard,
             size: 24,
@@ -331,10 +331,10 @@ class _AddProfileState extends State<AddProfile> {
       child: TextFormField(
         keyboardType: TextInputType.number,
         key: new Key('id'),
-        style: kContentTextstyle,
+        style: kFormTextstyle,
         decoration: InputDecoration(
           labelText: 'ID Number',
-          labelStyle: kContentTextstyle,
+          labelStyle: kFormTextstyle,
           icon: new Icon(
             FontAwesomeIcons.compass,
             size: 24,
@@ -359,11 +359,11 @@ class _AddProfileState extends State<AddProfile> {
       padding: const EdgeInsets.fromLTRB(5.0, 10.0, 10.0, 0.0),
       child: TextFormField(
         key: new Key('bisPhone'),
-        style: kContentTextstyle,
+        style: kFormTextstyle,
         keyboardType: TextInputType.number,
         decoration: InputDecoration(
           labelText: 'Mobile',
-          labelStyle: kContentTextstyle,
+          labelStyle: kFormTextstyle,
           icon: new Icon(
             FontAwesomeIcons.phone,
             size: 24,
@@ -389,10 +389,10 @@ class _AddProfileState extends State<AddProfile> {
           TextFormField(
             key: new Key('license'),
             keyboardType: TextInputType.text,
-            style: kContentTextstyle,
+            style: kFormTextstyle,
             decoration: InputDecoration(
-              labelText: 'Business License No.',
-              labelStyle: kContentTextstyle,
+              labelText: 'License No.',
+              labelStyle: kFormTextstyle,
               icon: new Icon(
                 FontAwesomeIcons.dollarSign,
                 size: 24,
@@ -417,10 +417,10 @@ class _AddProfileState extends State<AddProfile> {
       padding: const EdgeInsets.fromLTRB(5.0, 20.0, 10.0, 25.0),
       child: TextFormField(
         key: new Key('bisinsurance'),
-        style: kContentTextstyle,
+        style: kFormTextstyle,
         decoration: InputDecoration(
           labelText: 'Insurance',
-          labelStyle: kContentTextstyle,
+          labelStyle: kFormTextstyle,
           icon: new Icon(
             FontAwesomeIcons.link,
             size: 24,
@@ -486,7 +486,7 @@ class _AddProfileState extends State<AddProfile> {
     );
   }
 
-  Widget _notifyLocationCollection() {
+  Widget notifyLocationCollection() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0),
       child: Center(
@@ -885,7 +885,7 @@ class _AddProfileState extends State<AddProfile> {
             ),
             child: Column(
               children: <Widget>[
-                _notifyLocationCollection(),
+                // _notifyLocationCollection(),
                 _bisPhone(),
                 _bisInsurance(),
                 // _bisPosition(),
@@ -981,10 +981,10 @@ class _AddProfileState extends State<AddProfile> {
                       new SizedBox(
                         width: size.width * 0.15,
                       ),
-                      new Icon(Icons.restaurant, size: 15),
+                      new Icon(Icons.book, size: 15),
                       new SizedBox(width: 5.0),
                       new Text(
-                        'Driver',
+                        'Legal',
                         textScaleFactor: 0.7,
                       ),
                     ],
@@ -1001,12 +1001,12 @@ class _AddProfileState extends State<AddProfile> {
                       new SizedBox(
                         width: size.width * 0.15,
                       ),
-                      new Icon(Icons.queue_music, size: 15),
+                      new Icon(Icons.healing_rounded, size: 15),
                       new SizedBox(
                         width: 5.0,
                       ),
                       new Text(
-                        'Business',
+                        'Health',
                         textScaleFactor: 0.7,
                       ),
                     ],

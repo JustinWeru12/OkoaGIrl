@@ -366,6 +366,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ],
             ),
+            _addButton(),
           ],
         ),
       ),
@@ -375,6 +376,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _addButton() {
     return Container(
       width: 300.0,
+      margin: EdgeInsets.only(top: 15),
       child: isHealth
           ? RaisedButton(
               onPressed: () {},
