@@ -31,10 +31,10 @@ class HelpPage extends StatefulWidget {
 }
 
 class _HelpPageState extends State<HelpPage> {
-  final String _fullName = "Waweru Ndirangu";
+  final String _fullName = "Victor Justin Njuguna";
   final String _status = "Software Developer";
   final String _bio =
-      "\"Hi, I am a Freelance developer working under the banner Orion Industries. If you want to contact me or Get help about this product leave a message.\"";
+      "\"Hi, I am a Freelance developer working towards becoming a Development Brand. If you want to contact me or Get help about this product leave a message.\"";
   List<String> attachments = [];
   bool isHTML = false;
   var email = TextEditingController();
