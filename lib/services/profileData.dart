@@ -5,18 +5,15 @@ class ProfileData {
       idNo,
       phone,
       licenseNo,
-      noPlate,
       email,
       scanId,
       address,
       scanLicense,
       insurance,
-      category,
-      busCategory,
       makeModel;
   final location;
   final bool isVerified;
-  final List<String> pictures;
+  final List<dynamic> pictures;
   final List<int> due;
   final List<int> paid;
 
@@ -27,14 +24,11 @@ class ProfileData {
       this.idNo,
       this.phone,
       this.licenseNo,
-      this.noPlate,
       this.email,
       this.scanId,
       this.address,
       this.scanLicense,
       this.insurance,
-      this.category,
-      this.busCategory,
       this.location,
       this.isVerified,
       this.makeModel,
@@ -49,20 +43,14 @@ class ProfileData {
       "idNo": idNo,
       "phone": phone,
       "licenseNo": licenseNo,
-      "noPlate": noPlate,
       "email": email,
       "scanId": scanId,
       "address": address,
       "scanLicense": scanLicense,
       "insurance": insurance,
-      "category": category,
-      "businessCategory": busCategory,
       "location": location,
-      "isVerified": isVerified,
-      "makeModel": makeModel,
+      "isVerified": false,
       "pictures": pictures,
-      "paid": paid,
-      "due": due,
     };
   }
 }

@@ -504,7 +504,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     child: Center(
                       child: Text(
-                        "Already Register  ",
+                        "Already Registered",
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,

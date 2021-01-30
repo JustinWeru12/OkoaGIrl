@@ -73,6 +73,17 @@ class CrudMethods {
     });
   }
 
+  deleteBudget(docID) {
+    return FirebaseFirestore.instance.collection('budget').doc(docID).delete();
+  }
+
+  createOrUpdateProData(
+      id, collname, Map<String, dynamic> userDataMap) async {
+    DocumentReference ref =
+        FirebaseFirestore.instance.collection(collname).doc(id);
+    return ref.set(userDataMap, SetOptions(merge: true));
+  }
+
   Future<void> createDonation(Map<String, dynamic> dataMap) async {
     FirebaseFirestore.instance
         .collection('donation')
@@ -101,7 +112,7 @@ class CrudMethods {
     return ref.set({"donations": data}, SetOptions(merge: true));
   }
 
-    createOrUpdateCardData(Map<String, dynamic> userDataMap) async {
+  createOrUpdateCardData(Map<String, dynamic> userDataMap) async {
     User user = FirebaseAuth.instance.currentUser;
 //    print('USERID ' + user.uid);
     DocumentReference ref = FirebaseFirestore.instance

@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:okoagirl/constants/dividers.dart';
 import 'package:okoagirl/models/counter.dart';
+import 'package:okoagirl/pages/allusers.dart';
+import 'package:okoagirl/pages/budgetpage.dart';
+import 'package:okoagirl/pages/donationspage.dart';
+import 'package:okoagirl/pages/proprofiles.dart';
 import 'package:okoagirl/services/crud.dart';
 import 'package:okoagirl/constants/constants.dart';
 
@@ -177,7 +181,7 @@ class _AdminPanelState extends State<AdminPanel> {
                         child: Padding(
                           padding: EdgeInsets.all(10.0),
                           child: Text(
-                            "ADD BUDGET",
+                            "ADD ITEM",
                             style: TextStyle(
                                 color: kSecondaryColor,
                                 fontWeight: FontWeight.w600),
@@ -236,7 +240,12 @@ class _AdminPanelState extends State<AdminPanel> {
               Expanded(
                 child: InkWell(
                   onTap: () {
-                    _addLawVerify(context);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ProfessionalProfiles(
+                                  index: 0,
+                                )));
                   },
                   child: Container(
                     height: 40.0,
@@ -264,7 +273,12 @@ class _AdminPanelState extends State<AdminPanel> {
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
           child: InkWell(
             onTap: () {
-              _addVerify(context);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ProfessionalProfiles(
+                            index: 1,
+                          )));
             },
             child: Container(
               height: 40.0,
@@ -323,15 +337,29 @@ class _AdminPanelState extends State<AdminPanel> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Counter(
-                  color: kInfectedColor,
-                  number: budget ?? 0,
-                  title: "Budget",
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => BudgetPage()));
+                  },
+                  child: Counter(
+                    color: kInfectedColor,
+                    number: budget ?? 0,
+                    title: "Budget",
+                  ),
                 ),
-                Counter(
-                  color: kDeathColor,
-                  number: !snapshot.hasError ? donation : 0,
-                  title: "Donations",
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => DonationsPage()));
+                  },
+                  child: Counter(
+                    color: kDeathColor,
+                    number: !snapshot.hasError ? donation : 0,
+                    title: "Donations",
+                  ),
                 ),
                 Counter(
                   color: kRecovercolor,
@@ -765,7 +793,7 @@ class _AdminPanelState extends State<AdminPanel> {
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20.0)),
                                 child: Text(
-                                  'Add Budget',
+                                  'Add Item',
                                   style: TextStyle(
                                       fontSize: 15.0,
                                       fontWeight: FontWeight.bold),
@@ -775,7 +803,7 @@ class _AdminPanelState extends State<AdminPanel> {
                                   if (_formKey.currentState.validate()) {
                                     _formKey.currentState.save();
                                     addBudget();
-                                    showInSnackBar("Budget Added");
+                                    showInSnackBar("Item Added");
                                   }
                                   Navigator.of(context).pop();
                                 }),
@@ -816,33 +844,63 @@ class DashBoard extends StatelessWidget {
                     .collection('lawyers')
                     .snapshots(),
                 builder: (context, snapshot) {
-                  return Counter(
-                    color: kInfectedColor,
-                    number:
-                        snapshot.hasData ? snapshot.data.documents.length : 0,
-                    title: "Legal Officers",
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ProfessionalProfiles(
+                                    index: 0,
+                                  )));
+                    },
+                    child: Counter(
+                      color: kInfectedColor,
+                      number:
+                          snapshot.hasData ? snapshot.data.documents.length : 0,
+                      title: "Legal Officers",
+                    ),
                   );
                 }),
             StreamBuilder(
                 stream:
                     FirebaseFirestore.instance.collection('health').snapshots(),
                 builder: (context, snapshot) {
-                  return Counter(
-                    color: kDeathColor,
-                    number:
-                        snapshot.hasData ? snapshot.data.documents.length : 0,
-                    title: "Health Practioners",
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ProfessionalProfiles(
+                                    index: 1,
+                                  )));
+                    },
+                    child: Counter(
+                      color: kDeathColor,
+                      number:
+                          snapshot.hasData ? snapshot.data.documents.length : 0,
+                      title: "Health Practioners",
+                    ),
                   );
                 }),
             StreamBuilder(
-                stream:
-                    FirebaseFirestore.instance.collection('user').snapshots(),
+                stream: FirebaseFirestore.instance
+                    .collection('user')
+                    .where("admin", isEqualTo: false)
+                    .snapshots(),
                 builder: (context, snapshot) {
-                  return Counter(
-                    color: kRecovercolor,
-                    number:
-                        snapshot.hasData ? snapshot.data.documents.length : 0,
-                    title: "Users",
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AllUsersPage()));
+                    },
+                    child: Counter(
+                      color: kRecovercolor,
+                      number:
+                          snapshot.hasData ? snapshot.data.documents.length : 0,
+                      title: "Users",
+                    ),
                   );
                 }),
           ],
