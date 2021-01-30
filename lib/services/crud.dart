@@ -101,6 +101,17 @@ class CrudMethods {
     return ref.set({"donations": data}, SetOptions(merge: true));
   }
 
+    createOrUpdateCardData(Map<String, dynamic> userDataMap) async {
+    User user = FirebaseAuth.instance.currentUser;
+//    print('USERID ' + user.uid);
+    DocumentReference ref = FirebaseFirestore.instance
+        .collection('user')
+        .doc(user.uid)
+        .collection("cards")
+        .doc();
+    return ref.set(userDataMap, SetOptions(merge: true));
+  }
+
   getDeveloperData() async {
     return await FirebaseFirestore.instance
         .collection('res')

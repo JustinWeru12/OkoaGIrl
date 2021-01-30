@@ -44,7 +44,6 @@ class _ReportPageState extends State<ReportPage> {
   List<String> actions = [
     "Legal Action",
     "Therapy",
-    "Mass Information",
     "Medical Attention"
   ];
 

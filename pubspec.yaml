@@ -45,6 +45,9 @@ dependencies:
   location: ^3.0.2
   geoflutterfire: ^2.2.1
   geocoder: ^0.2.1
+  google_maps_flutter: ^1.0.6
+  stripe_payment: ^1.0.9
+  progress_dialog: ^1.2.2
 
 dev_dependencies:
   flutter_test:

@@ -1,10 +1,16 @@
+import 'dart:math' as math;
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:okoagirl/constants/constants.dart';
 import 'package:okoagirl/models/counter.dart';
 import 'package:okoagirl/pages/sidebar.dart';
 import 'package:okoagirl/services/authentication.dart';
 import 'package:okoagirl/services/crud.dart';
+import 'package:okoagirl/services/stripeservice.dart';
+import 'package:stripe_payment/stripe_payment.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 
 class DonatePage extends StatefulWidget {
   DonatePage({Key key, this.auth, this.logoutCallback}) : super(key: key);
@@ -37,7 +43,7 @@ class _DonatePageState extends State<DonatePage> {
   List<int> prices = [], tips = [50, 100, 200, 500, 1000, 0];
   List<int> amounts = [];
   CrudMethods crudObj = new CrudMethods();
-  String greetingMes, _fullName = " ", image;
+  String greetingMes, _fullName = " ", image, userId;
   bool isAdmin;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -79,6 +85,16 @@ class _DonatePageState extends State<DonatePage> {
     ));
   }
 
+  String convertCardNumber(String src, String divider) {
+    String newStr = '';
+    int step = 4;
+    for (int i = 0; i < src.length; i += step) {
+      newStr += src.substring(i, math.min(i + step, src.length));
+      if (i + step < src.length) newStr += divider;
+    }
+    return newStr;
+  }
+
   @override
   void initState() {
     greetingMes = greetingMessage();
@@ -90,10 +106,16 @@ class _DonatePageState extends State<DonatePage> {
         isAdmin = dataMap['admin'];
       });
     });
+    getCurrentUID().then((value) {
+      setState(() {
+        userId = value;
+      });
+    });
+    StripeService.init();
     super.initState();
   }
 
-    addDonation() {
+  addDonation() {
     Map<String, dynamic> budgetData = {
       "name": _fullName,
       "amount": tip,
@@ -106,6 +128,293 @@ class _DonatePageState extends State<DonatePage> {
     });
 
     crudObj.createDonation(budgetData);
+  }
+
+  Future<String> getCurrentUID() async {
+    return (FirebaseAuth.instance.currentUser).uid;
+  }
+
+  Future<bool> payViaNewCard(BuildContext context) async {
+    ProgressDialog dialog = new ProgressDialog(context);
+    dialog.style(message: 'Please wait...');
+    await dialog.show();
+    int _amount = tip * 100;
+    var response = await StripeService.payWithNewCard(
+      amount: _amount.toString(),
+      currency: 'GBP',
+    );
+    if (response.success) {
+      addDonation();
+      showInSnackBar("Donation Made");
+    }
+    await dialog.hide();
+    _scaffoldKey.currentState.showSnackBar(SnackBar(
+      content: Text(response.message),
+      duration:
+          new Duration(milliseconds: response.success == true ? 1200 : 3000),
+    ));
+    return response.success;
+  }
+
+  Future<bool> payViaExistingCard(BuildContext context, card) async {
+    ProgressDialog dialog = new ProgressDialog(context);
+    dialog.style(message: 'Please wait...');
+    await dialog.show();
+    var expiryArr = card['expiryDate'].split('/');
+    int _amount = tip * 100;
+    CreditCard stripeCard = CreditCard(
+      number: card['cardNumber'],
+      expMonth: int.parse(expiryArr[0]),
+      expYear: int.parse(expiryArr[1]),
+    );
+    var response = await StripeService.payViaExistingCard(
+        amount: _amount.toString(), currency: 'GBP', card: stripeCard);
+    if (response.success) {
+      addDonation();
+      showInSnackBar("Donation Made");
+    }
+    await dialog.hide();
+    _scaffoldKey.currentState.showSnackBar(SnackBar(
+      content: Text(response.message),
+      duration: new Duration(milliseconds: 1200),
+    ));
+    return response.success;
+  }
+
+  void openCheckoutSheet(context) {
+    showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (context) {
+          return StatefulBuilder(builder: (context, setState) {
+            return Container(
+                decoration: BoxDecoration(
+                  color: kBackgroundColor,
+                  borderRadius: BorderRadius.only(
+                    topLeft: const Radius.circular(20.0),
+                    topRight: const Radius.circular(20.0),
+                  ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          RaisedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              payViaNewCard(context).then((val) {
+                                if (val) {}
+                              });
+                            },
+                            padding: EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 0.0),
+                            shape: new RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(20.0)),
+                            color: kSecondaryColor,
+                            child: Padding(
+                              padding: EdgeInsets.all(10.0),
+                              child: Text(
+                                "NEW CARD",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                    fontSize: 16.0),
+                              ),
+                            ),
+                          ),
+                          Spacer(),
+                          RaisedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              openCardSheet(context);
+                            },
+                            shape: new RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(20.0)),
+                            color: kSecondaryColor,
+                            padding: EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 0.0),
+                            child: Padding(
+                              padding: EdgeInsets.all(10.0),
+                              child: Text(
+                                "SAVED CARD",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                    fontSize: 16.0),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ));
+          });
+        });
+  }
+
+  void openCardSheet(context) {
+    showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (context) {
+          return StatefulBuilder(builder: (context, setState) {
+            return ClipRRect(
+              borderRadius: BorderRadius.only(
+                topLeft: const Radius.circular(25.0),
+                topRight: const Radius.circular(25.0),
+              ),
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.27,
+                decoration: BoxDecoration(
+                  color: kBackgroundColor,
+                  borderRadius: BorderRadius.only(
+                    topLeft: const Radius.circular(25.0),
+                    topRight: const Radius.circular(25.0),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.27,
+                      width: MediaQuery.of(context).size.width,
+                      child: StreamBuilder(
+                          stream: FirebaseFirestore.instance
+                              .collection("user")
+                              .doc(userId)
+                              .collection("cards")
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) {
+                              return Container(
+                                child: Center(
+                                  child: Text("You do not have a saved card"),
+                                ),
+                              );
+                            } else if (snapshot.data.documents.length <= 0) {
+                              return Container(
+                                child: Center(
+                                  child: Text("You do not have a saved card"),
+                                ),
+                              );
+                            }
+                            return ListView.builder(
+                              itemCount: snapshot.data.documents.length,
+                              shrinkWrap: true,
+                              scrollDirection: Axis.horizontal,
+                              itemBuilder: (BuildContext context, int i) {
+                                var card = {
+                                  'cardNumber': snapshot.data.documents[i]
+                                      ['cardNumber'],
+                                  'expiryDate': snapshot.data.documents[i]
+                                      ['expiryDate'],
+                                  'cardHolderName': snapshot.data.documents[i]
+                                      ['cardHolderName'],
+                                  'cvvCode': snapshot.data.documents[i]
+                                      ['cvvCode'],
+                                  'color': snapshot.data.documents[i]['color'],
+                                  'showBackView': false,
+                                };
+                                return InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).pop();
+                                    payViaExistingCard(context, card)
+                                        .then((val) {
+                                      if (val) {}
+                                    });
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: Container(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.25,
+                                      width: MediaQuery.of(context).size.width *
+                                          0.8,
+                                      padding: EdgeInsets.all(32.0),
+                                      decoration: BoxDecoration(
+                                          color: card['color'] != null
+                                              ? Color(card['color'])
+                                              : Colors.purple[700],
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10))),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Text(
+                                            'CREDIT CARD',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                          SizedBox(height: 16.0),
+                                          Row(
+                                            children: <Widget>[
+                                              Container(
+                                                height: 50,
+                                                width: 50,
+                                                decoration: BoxDecoration(
+                                                    image: DecorationImage(
+                                                        fit: BoxFit.contain,
+                                                        image: AssetImage(
+                                                            'assets/icons/chip.png'))),
+                                              ),
+                                              Flexible(
+                                                  child: Center(
+                                                      child: Text(
+                                                          convertCardNumber(
+                                                              card[
+                                                                  'cardNumber'],
+                                                              '-'),
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize:
+                                                                  18.0)))),
+                                            ],
+                                          ),
+                                          Spacer(),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: <Widget>[
+                                              Text(card['expiryDate'],
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold)),
+                                              Text(card['cvvCode'],
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold))
+                                            ],
+                                          ),
+                                          Spacer(),
+                                          Text(card['cardHolderName'],
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18.0))
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          }),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          });
+        });
   }
 
   @override
@@ -342,12 +651,10 @@ class _DonatePageState extends State<DonatePage> {
                               if (customTip) {
                                 if (_formKey.currentState.validate()) {
                                   _formKey.currentState.save();
-                                  addDonation();
-                                  showInSnackBar("Donation Made");
+                                  openCheckoutSheet(context);
                                 }
                               } else {
-                                addDonation();
-                                showInSnackBar("Donation Made");
+                                openCheckoutSheet(context);
                               }
                             },
                           ),

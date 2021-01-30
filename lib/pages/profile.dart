@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:okoagirl/constants/constants.dart';
 import 'package:okoagirl/pages/addItems.dart';
+import 'package:okoagirl/pages/faq_page.dart';
+import 'package:okoagirl/pages/help.dart';
+import 'package:okoagirl/pages/paymentpage.dart';
 import 'package:okoagirl/pages/sidebar.dart';
 import 'package:okoagirl/services/authentication.dart';
 import 'package:okoagirl/services/crud.dart';
@@ -368,6 +371,85 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             _addButton(),
           ],
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
+        child: Container(
+          height: 80,
+          padding: EdgeInsets.only(bottom: 20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                blurRadius: 5,
+                color: Colors.black,
+                offset: Offset(2, 2),
+              )
+            ],
+            gradient: LinearGradient(
+              colors: [
+                kPrimaryColor,
+                kSecondaryColor,
+              ],
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  IconButton(
+                    icon: Image.asset('assets/icons/card.png'),
+                    onPressed: () => Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (_) => PaymentPage())),
+                  ),
+                  Text(
+                    'Cards',
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  )
+                ],
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  IconButton(
+                    icon: Image.asset('assets/icons/contact_us.png'),
+                    onPressed: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => HelpPage()));
+                    },
+                  ),
+                  Text(
+                    'Support',
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  )
+                ],
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  IconButton(
+                    icon: Image.asset('assets/icons/faq.png'),
+                    onPressed: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => FaqPage()));
+                    },
+                  ),
+                  Text(
+                    'FAQ',
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  )
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
