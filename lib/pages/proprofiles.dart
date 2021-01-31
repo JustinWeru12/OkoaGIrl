@@ -34,7 +34,7 @@ class _ProfessionalProfilesState extends State<ProfessionalProfiles> {
   emailSender(recipient, name) async {
     final Email email = Email(
       body:
-          'Welcome ro Okoa Girl Child $name.\n Your Professional Profile in Okoa Girl Child has been carefully reviewed and approved.\n You can now view cases and case information.It\'s our hope that you can help the girl child.\n\nRegards,\n Administrator - Okoa Girl Child',
+          'Welcome to Okoa Girl Child $name.\n Your Professional Profile in Okoa Girl Child has been carefully reviewed and approved.\n You can now view cases and case information.It\'s our hope that you can help the girl child.\n\nRegards,\n Administrator - Okoa Girl Child',
       subject: 'Account Verification',
       recipients: [recipient],
       isHTML: false,

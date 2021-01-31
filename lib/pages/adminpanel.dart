@@ -477,183 +477,183 @@ class _AdminPanelState extends State<AdminPanel> {
         });
   }
 
-  Future<bool> _addVerify(context) async {
-    Size size = MediaQuery.of(context).size;
-    return showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(20.0))),
-            backgroundColor: Colors.white,
-            title: Text(
-              'Enter the Id from the Email',
-              style: TextStyle(
-                  fontSize: 15.0,
-                  fontFamily: 'Nexa',
-                  fontWeight: FontWeight.normal,
-                  fontStyle: FontStyle.normal),
-              textAlign: TextAlign.center,
-            ),
-            content: Container(
-              width: size.width * 0.7,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Form(
-                      key: _formKey,
-                      child: TextFormField(
-                        style: TextStyle(fontSize: 16.0, color: Colors.black),
-                        autofocus: false,
-                        decoration: new InputDecoration(
-                          contentPadding:
-                              EdgeInsets.fromLTRB(15.0, 0.0, 10.0, 0.0),
-                          labelText: 'Profile Id',
-                          hintText: 'id from email',
-                          hintStyle: TextStyle(
-                              fontSize: 17.0, fontStyle: FontStyle.italic),
-                          border: new OutlineInputBorder(
-                            borderRadius: new BorderRadius.circular(5.0),
-                            borderSide: new BorderSide(),
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value.isEmpty)
-                            return 'Please Enter an Id';
-                          else {
-                            return null; // print(_email);
-                          }
-                        },
-                        controller: profid,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: RaisedButton(
-                      color: Theme.of(context).accentColor,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0)),
-                      child: Text(
-                        'Verify',
-                        style: TextStyle(
-                            fontSize: 15.0, fontWeight: FontWeight.bold),
-                      ),
-                      textColor: Colors.white,
-                      onPressed: () {
-                        String _id = profid.text.toString();
-                        if (_formKey.currentState.validate()) {
-                          _formKey.currentState.save();
-                          FirebaseFirestore.instance
-                              .collection('health')
-                              .doc(_id)
-                              .set({'isVerified': true},
-                                  SetOptions(merge: true)).catchError((e) {
-                            print(e.code);
-                          });
-                          Navigator.of(context).pop();
-                        }
-                      },
-                    ),
-                  )
-                ],
-              ),
-            ),
-          );
-        });
-  }
+  // Future<bool> _addVerify(context) async {
+  //   Size size = MediaQuery.of(context).size;
+  //   return showDialog(
+  //       context: context,
+  //       barrierDismissible: false,
+  //       builder: (BuildContext context) {
+  //         return AlertDialog(
+  //           shape: RoundedRectangleBorder(
+  //               borderRadius: BorderRadius.all(Radius.circular(20.0))),
+  //           backgroundColor: Colors.white,
+  //           title: Text(
+  //             'Enter the Id from the Email',
+  //             style: TextStyle(
+  //                 fontSize: 15.0,
+  //                 fontFamily: 'Nexa',
+  //                 fontWeight: FontWeight.normal,
+  //                 fontStyle: FontStyle.normal),
+  //             textAlign: TextAlign.center,
+  //           ),
+  //           content: Container(
+  //             width: size.width * 0.7,
+  //             child: Column(
+  //               mainAxisSize: MainAxisSize.min,
+  //               children: <Widget>[
+  //                 Padding(
+  //                   padding: const EdgeInsets.all(8.0),
+  //                   child: Form(
+  //                     key: _formKey,
+  //                     child: TextFormField(
+  //                       style: TextStyle(fontSize: 16.0, color: Colors.black),
+  //                       autofocus: false,
+  //                       decoration: new InputDecoration(
+  //                         contentPadding:
+  //                             EdgeInsets.fromLTRB(15.0, 0.0, 10.0, 0.0),
+  //                         labelText: 'Profile Id',
+  //                         hintText: 'id from email',
+  //                         hintStyle: TextStyle(
+  //                             fontSize: 17.0, fontStyle: FontStyle.italic),
+  //                         border: new OutlineInputBorder(
+  //                           borderRadius: new BorderRadius.circular(5.0),
+  //                           borderSide: new BorderSide(),
+  //                         ),
+  //                       ),
+  //                       validator: (value) {
+  //                         if (value.isEmpty)
+  //                           return 'Please Enter an Id';
+  //                         else {
+  //                           return null; // print(_email);
+  //                         }
+  //                       },
+  //                       controller: profid,
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 Padding(
+  //                   padding: const EdgeInsets.all(8.0),
+  //                   child: RaisedButton(
+  //                     color: Theme.of(context).accentColor,
+  //                     shape: RoundedRectangleBorder(
+  //                         borderRadius: BorderRadius.circular(20.0)),
+  //                     child: Text(
+  //                       'Verify',
+  //                       style: TextStyle(
+  //                           fontSize: 15.0, fontWeight: FontWeight.bold),
+  //                     ),
+  //                     textColor: Colors.white,
+  //                     onPressed: () {
+  //                       String _id = profid.text.toString();
+  //                       if (_formKey.currentState.validate()) {
+  //                         _formKey.currentState.save();
+  //                         FirebaseFirestore.instance
+  //                             .collection('health')
+  //                             .doc(_id)
+  //                             .set({'isVerified': true},
+  //                                 SetOptions(merge: true)).catchError((e) {
+  //                           print(e.code);
+  //                         });
+  //                         Navigator.of(context).pop();
+  //                       }
+  //                     },
+  //                   ),
+  //                 )
+  //               ],
+  //             ),
+  //           ),
+  //         );
+  //       });
+  // }
 
-  Future<bool> _addLawVerify(context) async {
-    Size size = MediaQuery.of(context).size;
-    return showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(20.0))),
-            backgroundColor: Colors.white,
-            title: Text(
-              'Enter the Id from the Email',
-              style: TextStyle(
-                  fontSize: 15.0,
-                  fontFamily: 'Nexa',
-                  fontWeight: FontWeight.normal,
-                  fontStyle: FontStyle.normal),
-              textAlign: TextAlign.center,
-            ),
-            content: Container(
-              width: size.width * 0.7,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Form(
-                      key: _formKey,
-                      child: TextFormField(
-                        style: TextStyle(fontSize: 16.0, color: Colors.black),
-                        autofocus: false,
-                        decoration: new InputDecoration(
-                          contentPadding:
-                              EdgeInsets.fromLTRB(15.0, 0.0, 10.0, 0.0),
-                          labelText: 'Profile Id',
-                          hintText: 'id from email',
-                          hintStyle: TextStyle(
-                              fontSize: 17.0, fontStyle: FontStyle.italic),
-                          border: new OutlineInputBorder(
-                            borderRadius: new BorderRadius.circular(5.0),
-                            borderSide: new BorderSide(),
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value.isEmpty)
-                            return 'Please Enter an Id';
-                          else {
-                            return null; // print(_email);
-                          }
-                        },
-                        controller: profid,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: RaisedButton(
-                      color: Theme.of(context).accentColor,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0)),
-                      child: Text(
-                        'Verify',
-                        style: TextStyle(
-                            fontSize: 15.0, fontWeight: FontWeight.bold),
-                      ),
-                      textColor: Colors.white,
-                      onPressed: () {
-                        String _id = profid.text.toString();
-                        if (_formKey.currentState.validate()) {
-                          _formKey.currentState.save();
-                          FirebaseFirestore.instance
-                              .collection('ProfessionalProfile')
-                              .doc(_id)
-                              .set({'isVerified': true},
-                                  SetOptions(merge: true)).catchError((e) {
-                            print(e.code);
-                          });
-                          Navigator.of(context).pop();
-                        }
-                      },
-                    ),
-                  )
-                ],
-              ),
-            ),
-          );
-        });
-  }
+  // Future<bool> _addLawVerify(context) async {
+  //   Size size = MediaQuery.of(context).size;
+  //   return showDialog(
+  //       context: context,
+  //       barrierDismissible: false,
+  //       builder: (BuildContext context) {
+  //         return AlertDialog(
+  //           shape: RoundedRectangleBorder(
+  //               borderRadius: BorderRadius.all(Radius.circular(20.0))),
+  //           backgroundColor: Colors.white,
+  //           title: Text(
+  //             'Enter the Id from the Email',
+  //             style: TextStyle(
+  //                 fontSize: 15.0,
+  //                 fontFamily: 'Nexa',
+  //                 fontWeight: FontWeight.normal,
+  //                 fontStyle: FontStyle.normal),
+  //             textAlign: TextAlign.center,
+  //           ),
+  //           content: Container(
+  //             width: size.width * 0.7,
+  //             child: Column(
+  //               mainAxisSize: MainAxisSize.min,
+  //               children: <Widget>[
+  //                 Padding(
+  //                   padding: const EdgeInsets.all(8.0),
+  //                   child: Form(
+  //                     key: _formKey,
+  //                     child: TextFormField(
+  //                       style: TextStyle(fontSize: 16.0, color: Colors.black),
+  //                       autofocus: false,
+  //                       decoration: new InputDecoration(
+  //                         contentPadding:
+  //                             EdgeInsets.fromLTRB(15.0, 0.0, 10.0, 0.0),
+  //                         labelText: 'Profile Id',
+  //                         hintText: 'id from email',
+  //                         hintStyle: TextStyle(
+  //                             fontSize: 17.0, fontStyle: FontStyle.italic),
+  //                         border: new OutlineInputBorder(
+  //                           borderRadius: new BorderRadius.circular(5.0),
+  //                           borderSide: new BorderSide(),
+  //                         ),
+  //                       ),
+  //                       validator: (value) {
+  //                         if (value.isEmpty)
+  //                           return 'Please Enter an Id';
+  //                         else {
+  //                           return null; // print(_email);
+  //                         }
+  //                       },
+  //                       controller: profid,
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 Padding(
+  //                   padding: const EdgeInsets.all(8.0),
+  //                   child: RaisedButton(
+  //                     color: Theme.of(context).accentColor,
+  //                     shape: RoundedRectangleBorder(
+  //                         borderRadius: BorderRadius.circular(20.0)),
+  //                     child: Text(
+  //                       'Verify',
+  //                       style: TextStyle(
+  //                           fontSize: 15.0, fontWeight: FontWeight.bold),
+  //                     ),
+  //                     textColor: Colors.white,
+  //                     onPressed: () {
+  //                       String _id = profid.text.toString();
+  //                       if (_formKey.currentState.validate()) {
+  //                         _formKey.currentState.save();
+  //                         FirebaseFirestore.instance
+  //                             .collection('ProfessionalProfile')
+  //                             .doc(_id)
+  //                             .set({'isVerified': true},
+  //                                 SetOptions(merge: true)).catchError((e) {
+  //                           print(e.code);
+  //                         });
+  //                         Navigator.of(context).pop();
+  //                       }
+  //                     },
+  //                   ),
+  //                 )
+  //               ],
+  //             ),
+  //           ),
+  //         );
+  //       });
+  // }
 
   void _addBudget(context) async {
     Size size = MediaQuery.of(context).size;

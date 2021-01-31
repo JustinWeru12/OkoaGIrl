@@ -1,15 +1,20 @@
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:okoagirl/constants/constants.dart';
 import 'package:okoagirl/constants/primary_button.dart';
 import 'package:okoagirl/services/authentication.dart';
 import 'package:okoagirl/services/crud.dart';
+import 'package:okoagirl/services/profileData.dart';
 import 'package:okoagirl/services/user.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-enum FormType { login, register, reset, phone }
+enum FormType { login, register, reset, pro1, pro }
 
 class LoginSignUpPage extends StatefulWidget {
   LoginSignUpPage({Key key, this.title, this.auth, this.loginCallback})
@@ -41,6 +46,11 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
   String _password, phoneNo, verificationId, smsCode;
   bool _isLoading = false, codeSent = false;
   Color dobColor = kSecondaryColor;
+  String _licensceNo, _location, _phone, _idNo, _bio, _insurance;
+  List<File> bisPictureFile = new List<File>(3);
+  List photoDescription = ["PassPort Photo", "ID/License", "Other"];
+  bool isLaw = true, isHealth = false;
+  final picker = ImagePicker();
   // Check if form is valid before perform login or signup
   bool validateAndSave() {
     final form = _formKey.currentState;
@@ -49,6 +59,164 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
       return true;
     }
     return false;
+  }
+
+  bool validateAndConfirm() {
+    final form = _formKey.currentState;
+    if (form.validate()) {
+      form.save();
+      return true;
+    }
+    return false;
+  }
+
+  void validateAndRegisterLaw() async {
+    if (validateAndSave()) {
+      setState(() {
+        _isLoading = true;
+      });
+      ProfileData bisData = new ProfileData(
+        name: _fullNames,
+        bio: _bio,
+        idNo: _idNo,
+        phone: _phone,
+        email: _email,
+        licenseNo: _licensceNo,
+        insurance: _insurance,
+        location: _location,
+        pictures: [],
+      );
+      User user = FirebaseAuth.instance.currentUser;
+      DocumentReference docRef =
+          FirebaseFirestore.instance.collection('lawyers').doc(user.uid);
+      uploadLawPictures(docRef.id);
+      return docRef
+          .set(bisData.getProfileDataMap(), SetOptions(merge: true))
+          .whenComplete(() => {
+                crudObj.createOrUpdateUserData({'isLegal': true}),
+                widget.loginCallback()
+              });
+
+//      setState(() {
+//        _isLoading = false;
+//      });
+
+    } else {
+//      setState(() {
+//        _authHint = '';
+//      });
+    }
+  }
+
+  void validateAndRegisterHealth() async {
+    if (validateAndConfirm()) {
+      setState(() {
+        _isLoading = true;
+      });
+      ProfileData bisData = new ProfileData(
+        name: _fullNames,
+        bio: _bio,
+        idNo: _idNo,
+        phone: _phone,
+        email: _email,
+        licenseNo: _licensceNo,
+        insurance: _insurance,
+        location: _location,
+        pictures: [],
+      );
+      User user = FirebaseAuth.instance.currentUser;
+      DocumentReference docRef =
+          FirebaseFirestore.instance.collection('health').doc(user.uid);
+      uploadHealthPictures(docRef.id);
+      return docRef
+          .set(bisData.getProfileDataMap(), SetOptions(merge: true))
+          .whenComplete(() => {
+                crudObj.createOrUpdateUserData({'isHealth': true}),
+                widget.loginCallback()
+              });
+
+//      setState(() {
+//        _isLoading = false;
+//      });
+
+    } else {
+//      setState(() {
+//        _authHint = '';
+//      });
+    }
+  }
+
+  Future getImageFromGallery(picNumber) async {
+    var pickedImage = await picker.getImage(source: ImageSource.gallery);
+    var tempImage = File(pickedImage.path);
+    if (picNumber == 0) {
+      setState(() {
+        bisPictureFile[0] = tempImage;
+      });
+    }
+    if (picNumber == 1) {
+      setState(() {
+        bisPictureFile[1] = tempImage;
+      });
+    }
+    if (picNumber == 2) {
+      setState(() {
+        bisPictureFile[2] = tempImage;
+      });
+    }
+  }
+
+  uploadLawPictures(bisID) async {
+    List<String> urlList = [];
+    for (int i = 0; i < bisPictureFile.length; i++) {
+      if (bisPictureFile[i] != null) {
+        final StorageReference firebaseStorageRef =
+            FirebaseStorage.instance.ref().child('lawPics/$bisID/$i.jpg');
+        final StorageUploadTask task =
+            firebaseStorageRef.putFile(bisPictureFile[i]);
+        var downloadUrl = await (await task.onComplete).ref.getDownloadURL();
+        var url = downloadUrl.toString();
+        urlList.add(url);
+        print(urlList);
+      }
+    }
+    setState(() {
+      _isLoading = false;
+    });
+    updatePictures(urlList, bisID);
+  }
+
+  updatePictures(picUrlList, bisID) {
+    FirebaseFirestore.instance
+        .collection('lawyers')
+        .doc(bisID)
+        .update({"pictures": picUrlList});
+  }
+
+  uploadHealthPictures(bisID) async {
+    List<String> urlList = [];
+    for (int i = 0; i < bisPictureFile.length; i++) {
+      if (bisPictureFile[i] != null) {
+        final StorageReference firebaseStorageRef =
+            FirebaseStorage.instance.ref().child('healthPics/$bisID/$i.jpg');
+        final StorageUploadTask task =
+            firebaseStorageRef.putFile(bisPictureFile[i]);
+        var downloadUrl = await (await task.onComplete).ref.getDownloadURL();
+        var url = downloadUrl.toString();
+        urlList.add(url);
+      }
+    }
+    setState(() {
+      _isLoading = false;
+    });
+    updateHealthPictures(urlList, bisID);
+  }
+
+  updateHealthPictures(picUrlList, bisID) {
+    FirebaseFirestore.instance
+        .collection('health')
+        .doc(bisID)
+        .update({"pictures": picUrlList});
   }
 
   // Perform login or signup
@@ -61,8 +229,6 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
         String userId;
         if (_formType == FormType.login) {
           userId = await widget.auth.signIn(_email, _password);
-        } else if (_formType == FormType.phone) {
-          Auth().signInWithOTP(smsCode, verificationId);
         } else {
           userId = await widget.auth.signUp(_email, _password);
         }
@@ -75,26 +241,30 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
             email: _email,
             phone: "",
             picture:
-                "https://firebasestorage.googleapis.com/v0/b/enroute-25815.appspot.com/o/restaurant-red-beans-coffee.jpg?alt=media&token=a75145f8-1351-4335-bc75-432849dac887",
+                "https://firebasestorage.googleapis.com/v0/b/nightlyfe-9fe92.appspot.com/o/private%2Fhome.png?alt=media&token=900267d4-25d9-4144-b7de-53b3f559804d",
             isHealth: false,
             isLegal: false,
             admin: false,
           );
           crudObj.createOrUpdateUserData(userData.getDataMap());
+        } else if (_formType == FormType.pro) {
+          UserData userData = new UserData(
+            fullNames: _fullNames,
+            email: _email,
+            phone: phoneNo,
+            picture:
+                "https://firebasestorage.googleapis.com/v0/b/nightlyfe-9fe92.appspot.com/o/private%2Fhome.png?alt=media&token=900267d4-25d9-4144-b7de-53b3f559804d",
+            isHealth: isHealth,
+            isLegal: isLaw,
+            admin: false,
+          );
+          crudObj.createOrUpdateUserData(userData.getDataMap());
+          if (isLaw) {
+            validateAndRegisterLaw();
+          } else {
+            validateAndRegisterHealth();
+          }
         }
-        //  else if (_formType == FormType.phone) {
-        //   UserData userData = new UserData(
-        //     fullNames: 'Anonymous',
-        //     email: "",
-        //     phone: phoneNo,
-        //     picture:
-        //         "https://firebasestorage.googleapis.com/v0/b/enroute-25815.appspot.com/o/restaurant-red-beans-coffee.jpg?alt=media&token=a75145f8-1351-4335-bc75-432849dac887",
-        //     isHealth: false,
-        //     isLegal: false,
-        //     admin: false,
-        //   );
-        //   crudObj.createOrUpdateUserData(userData.getDataMap());
-        // }
 
         if (userId == null && _formType == FormType.login) {
           print("EMAIL NOT VERIFIED");
@@ -106,7 +276,9 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
         } else {
           _isLoading = false;
           _authHint = '';
-          widget.loginCallback();
+          if (_formType != FormType.pro) {
+            widget.loginCallback();
+          }
         }
       } catch (e) {
         setState(() {
@@ -161,13 +333,13 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
     });
   }
 
-  // void moveToPhone() {
-  //   _formKey.currentState.reset();
-  //   setState(() {
-  //     _formType = FormType.phone;
-  //     _authHint = '';
-  //   });
-  // }
+  void moveToPro() {
+    _formKey.currentState.reset();
+    setState(() {
+      _formType = FormType.pro;
+      _authHint = '';
+    });
+  }
 
   Widget _buildEmailField() {
     return Padding(
@@ -338,38 +510,308 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
     );
   }
 
-  Widget _buildCodeField() {
-    return codeSent
-        ? Padding(
-            padding: const EdgeInsets.fromLTRB(0.0, 15.0, 10.0, 0.0),
-            child: TextFormField(
-              maxLines: 1,
-              key: new Key('namefield'),
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.fromLTRB(15.0, 0.0, 10.0, 0.0),
-                labelText: 'Sms Code',
-                labelStyle: kSubTextStyle,
-                prefixIcon: new Icon(
-                  Icons.keyboard,
-                  color: kSecondaryColor,
-                ),
-                border: new OutlineInputBorder(
-                  borderRadius: new BorderRadius.circular(42),
-                  borderSide: new BorderSide(),
-                ),
-                filled: true,
-                fillColor: kBackgroundColor.withOpacity(0.75),
-              ),
-              validator: (String value) {
-                if (value.isEmpty) {
-                  value = "None";
+  Widget _toggle() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 0.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text("Lawyer Profile", style: kSubTextStyle),
+          Switch(
+            value: isLaw,
+            onChanged: (val) {
+              setState(() {
+                isLaw = !isLaw;
+                if (isHealth) {
+                  isHealth = false;
                 }
-                return null;
-              },
-              onSaved: (value) => smsCode = value,
-            ),
+              });
+            },
+          ),
+          Spacer(),
+          Text("Health Profile", style: kSubTextStyle),
+          Switch(
+            value: isHealth,
+            onChanged: (val) {
+              setState(() {
+                isHealth = !isHealth;
+                if (isLaw) {
+                  isLaw = false;
+                }
+              });
+            },
           )
-        : Container();
+        ],
+      ),
+    );
+  }
+
+  Widget _bisBio() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+      child: TextFormField(
+        key: new Key('description'),
+        style: kSubTextStyle,
+        decoration: InputDecoration(
+          labelText: 'Biography',
+          contentPadding: EdgeInsets.fromLTRB(15.0, 0.0, 10.0, 0.0),
+          filled: true,
+          fillColor: kBackgroundColor.withOpacity(0.75),
+          labelStyle: kSubTextStyle,
+          border: new OutlineInputBorder(
+            borderRadius: new BorderRadius.circular(42),
+            borderSide: new BorderSide(),
+          ),
+          prefixIcon: new Icon(
+            FontAwesomeIcons.solidClipboard,
+            size: 24,
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
+        validator: (String value) {
+          if (value.isEmpty) {
+            return 'Add a little catchy description';
+          }
+          return null;
+        },
+        onSaved: (value) => _bio = value,
+      ),
+    );
+  }
+
+  Widget _bisId() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+      child: TextFormField(
+        keyboardType: TextInputType.number,
+        key: new Key('id'),
+        style: kSubTextStyle,
+        decoration: InputDecoration(
+          labelText: 'ID Number',
+          contentPadding: EdgeInsets.fromLTRB(15.0, 0.0, 10.0, 0.0),
+          filled: true,
+          fillColor: kBackgroundColor.withOpacity(0.75),
+          labelStyle: kSubTextStyle,
+          border: new OutlineInputBorder(
+            borderRadius: new BorderRadius.circular(42),
+            borderSide: new BorderSide(),
+          ),
+          prefixIcon: new Icon(
+            FontAwesomeIcons.compass,
+            size: 24,
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
+        validator: (String value) {
+          if (value.isEmpty) {
+            return 'Enter Id No';
+          } else if (value.length < 8) {
+            return 'Enter a Valid Id No';
+          }
+          return null;
+        },
+        onSaved: (value) => _idNo = value,
+      ),
+    );
+  }
+
+  Widget _bisPhone() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+      child: TextFormField(
+        key: new Key('bisPhone'),
+        style: kSubTextStyle,
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+          labelText: 'Mobile',
+          contentPadding: EdgeInsets.fromLTRB(15.0, 0.0, 10.0, 0.0),
+          filled: true,
+          fillColor: kBackgroundColor.withOpacity(0.75),
+          labelStyle: kSubTextStyle,
+          border: new OutlineInputBorder(
+            borderRadius: new BorderRadius.circular(42),
+            borderSide: new BorderSide(),
+          ),
+          prefixIcon: new Icon(
+            FontAwesomeIcons.phone,
+            size: 24,
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
+        validator: (String value) {
+          if (value.isEmpty) {
+            return 'Enter a Phone Number';
+          }
+          return null;
+        },
+        onSaved: (value) => _phone = value,
+      ),
+    );
+  }
+
+  Widget _bisLicense() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+      child: Column(
+        children: <Widget>[
+          TextFormField(
+            key: new Key('license'),
+            keyboardType: TextInputType.text,
+            style: kSubTextStyle,
+            decoration: InputDecoration(
+              labelText: 'License No.',
+              contentPadding: EdgeInsets.fromLTRB(15.0, 0.0, 10.0, 0.0),
+              filled: true,
+              fillColor: kBackgroundColor.withOpacity(0.75),
+              labelStyle: kSubTextStyle,
+              border: new OutlineInputBorder(
+                borderRadius: new BorderRadius.circular(42),
+                borderSide: new BorderSide(),
+              ),
+              prefixIcon: new Icon(
+                FontAwesomeIcons.dollarSign,
+                size: 24,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+            validator: (String value) {
+              if (value.isEmpty) {
+                return 'Enter a valid License';
+              }
+              return null;
+            },
+            onSaved: (value) => _licensceNo = value,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _bisInsurance() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+      child: TextFormField(
+        key: new Key('bisinsurance'),
+        style: kSubTextStyle,
+        decoration: InputDecoration(
+          labelText: 'Insurance',
+          contentPadding: EdgeInsets.fromLTRB(15.0, 0.0, 10.0, 0.0),
+          filled: true,
+          fillColor: kBackgroundColor.withOpacity(0.75),
+          labelStyle: kSubTextStyle,
+          border: new OutlineInputBorder(
+            borderRadius: new BorderRadius.circular(42),
+            borderSide: new BorderSide(),
+          ),
+          prefixIcon: new Icon(
+            FontAwesomeIcons.link,
+            size: 24,
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
+        onSaved: (value) => _insurance = value,
+      ),
+    );
+  }
+
+  Widget _selectionPictures() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(5.0, 50.0, 10.0, 0.0),
+      child: Container(
+        height: 220,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          shrinkWrap: true,
+          itemCount: bisPictureFile.length,
+          itemBuilder: (BuildContext context, int index) {
+            return Column(
+              key: Key('pic$index'),
+              children: <Widget>[
+                Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20.0),
+                      color: Colors.grey[300]),
+                  margin: EdgeInsets.only(right: 10),
+                  width: 250,
+                  height: 200,
+                  child: bisPictureFile[index] == null
+                      ? FlatButton(
+                          onPressed: () {
+                            getImageFromGallery(index);
+                          },
+                          child: Icon(Icons.add_circle_outline),
+                        )
+                      : InkWell(
+                          onTap: () {
+                            getImageFromGallery(index);
+                          },
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20.0),
+                            child: Image.file(
+                              bisPictureFile[index],
+                              height: 200,
+                              width: 200,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                ),
+                Text(
+                  photoDescription[index],
+                  style: TextStyle(color: Colors.grey[600]),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  void _showDialogMissingPhoto() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.only(top: 8.0),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "Photo missing",
+                  style: TextStyle(fontSize: 20),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "Legal document photos are required!",
+                  textAlign: TextAlign.justify,
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  FlatButton(
+                    child: new Text(
+                      "Ok",
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Widget submitWidgets() {
@@ -427,28 +869,23 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
             SizedBox(height: 20.0),
           ],
         );
-      case FormType.phone:
+      case FormType.pro:
         return ListView(
           shrinkWrap: true,
           physics: ScrollPhysics(),
           children: <Widget>[
-            codeSent
-                ? PrimaryButton(
-                    key: new Key('registerphone'),
-                    text: 'Sign In',
-                    height: 44.0,
-                    onPressed: validateAndSubmit)
-                : PrimaryButton(
-                    key: new Key('registerphone'),
-                    text: 'Send Code',
-                    height: 44.0,
-                    onPressed: () {
-                      if (_formKey.currentState.validate()) {
-                        _formKey.currentState.save();
-                        verifyPhone(phoneNo);
-                        // widget.loginCallback();
-                      }
-                    }),
+            PrimaryButton(
+                key: new Key('registerphone'),
+                text: 'Register',
+                height: 44.0,
+                onPressed: () {
+                  if (bisPictureFile[0] == null) {
+                    validateAndSave();
+                    _showDialogMissingPhoto();
+                  } else {
+                    validateAndSubmit();
+                  }
+                }),
             SizedBox(height: 20.0),
             FlatButton(
                 key: new Key('need-login'),
@@ -472,12 +909,17 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
               height: 44.0,
               onPressed: validateAndSubmit,
             ),
-            SizedBox(height: 20.0),
+            SizedBox(height: 10.0),
             FlatButton(
                 key: new Key('need-login'),
                 child: Text("Already Have an Account ? Login"),
                 onPressed: moveToLogin),
-            SizedBox(height: 20.0),
+            SizedBox(height: 10.0),
+            FlatButton(
+                key: new Key('need-pro'),
+                child: Text("Pro account"),
+                onPressed: moveToPro),
+            SizedBox(height: 10.0),
           ],
         );
     }
@@ -525,64 +967,6 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
             textAlign: TextAlign.center));
   }
 
-  // Container _buildGoogleLoginButton() {
-  //   return Container(
-  //     width: 120.0,
-  //     height: 48.0,
-  //     margin: EdgeInsets.only(left: 0.0, top: 0.0, right: 0.0, bottom: 0.0),
-  //     child: ButtonTheme(
-  //         height: 48,
-  //         child: SignInButton(
-  //           Buttons.Google,
-  //           text: "Google",
-  //           onPressed: () {
-  //             _handleSignIn();
-  //           },
-  //         )),
-  //   );
-  // }
-
-  // Future<void> _handleSignIn() async {
-  //   try {
-  //     await googleSignIn.signIn().then((value) {
-  //       if (value != null) {
-  //         UserData userData = new UserData(
-  //           fullNames: value.displayName,
-  //           email: value.email,
-  //           phone: "",
-  //           picture: value.photoUrl,
-  //           isHealth: false,
-  //           isLegal: false,
-  //           admin: false,
-  //         );
-  //         crudObj.createOrUpdateUserData(userData.getDataMap());
-  //         Navigator.push(
-  //             context,
-  //             MaterialPageRoute(
-  //                 builder: (context) => HomePage(userId: value.id)));
-  //       }
-  //     });
-  //   } catch (error) {
-  //     print(error);
-  //   }
-  // }
-
-  // Container _buildPhoneLoginButton() {
-  //   return Container(
-  //     width: 120.0,
-  //     height: 48.0,
-  //     margin: EdgeInsets.only(left: 0.0, top: 0.0, right: 0.0, bottom: 0.0),
-  //     child: ButtonTheme(
-  //         height: 48,
-  //         child: RaisedButton(
-  //             child: Row(children: <Widget>[
-  //               Icon(Icons.phone),
-  //               Text("\tPhone"),
-  //             ]),
-  //             onPressed: moveToPhone)),
-  //   );
-  // }
-
   Widget _buildForm() {
     return Form(
         key: _formKey,
@@ -590,73 +974,41 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             hintText(),
-            _formType == FormType.register
+            _formType == FormType.register || _formType == FormType.pro
                 ? _buildNameField()
                 : Container(height: 0.0),
             SizedBox(
-              height: 10.0,
+              height: 5.0,
             ),
-            _formType != FormType.phone ? _buildEmailField() : Container(),
+            _buildEmailField(),
             SizedBox(
-              height: 10.0,
+              height: 5.0,
             ),
-            _formType != FormType.reset && _formType != FormType.phone
-                ? _buildPasswordField()
-                : Container(),
+            _formType != FormType.reset ? _buildPasswordField() : Container(),
             SizedBox(
-              height: 10.0,
+              height: 5.0,
             ),
-            _formType == FormType.register && _formType != FormType.phone
+            _formType == FormType.register || _formType == FormType.pro
                 ? _builConfirmPasswordTextField()
                 : Container(),
+            _formType == FormType.pro ? _bisBio() : Container(),
+            _formType == FormType.pro ? _toggle() : Container(),
+            _formType == FormType.pro ? _bisId() : Container(),
+            _formType == FormType.pro ? _bisPhone() : Container(),
+            _formType == FormType.pro ? _bisLicense() : Container(),
+            _formType == FormType.pro ? _bisInsurance() : Container(),
+            _formType == FormType.pro ? _selectionPictures() : Container(),
             SizedBox(
               height: 10.0,
             ),
-            _formType == FormType.phone ? _buildPhoneField() : Container(),
-            _formType == FormType.phone
-                ? SizedBox(
-                    height: 10.0,
-                  )
-                : Container(),
-            _formType == FormType.phone ? _buildCodeField() : Container(),
-            _formType == FormType.phone
-                ? SizedBox(
-                    height: 10.0,
-                  )
-                : Container(),
             _isLoading == false
                 ? Padding(
                     padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
                     child: submitWidgets(),
                   )
                 : _showCircularProgress(),
-            // _formType == FormType.login
-            //     ? Center(
-            //         child: new Text(
-            //           'Sign in with',
-            //           textAlign: TextAlign.center,
-            //           style: TextStyle(
-            //               fontSize: 18.0,
-            //               fontWeight: FontWeight.bold,
-            //               color: kBackgroundColor),
-            //         ),
-            //       )
-            //     : Container(),
-            // SizedBox(
-            //   height: 10,
-            // ),
-            // _formType == FormType.login
-            //     ? Row(
-            //         mainAxisAlignment: MainAxisAlignment.spaceAround,
-            //         children: <Widget>[
-            //           // _buildGoogleLoginButton(),
-            //           // _buildFacebookLoginButton(),
-            //           _buildPhoneLoginButton(),
-            //         ],
-            //       )
-            //     : Container(),
             SizedBox(
-              height: 20.0,
+              height: 10.0,
             ),
           ],
         ));

@@ -41,13 +41,7 @@ class _AddProfileState extends State<AddProfile> {
   PermissionStatus _permissionGranted;
   LocationData currentLocation;
   bool _isLoading = false;
-  String _name,
-      _licensceNo,
-      _location,
-      _phone,
-      _idNo,
-      _bio,
-      _insurance;
+  String _name, _licensceNo, _location, _phone, _idNo, _bio, _insurance;
   List<File> bisPictureFile = new List<File>(3);
   List photoDescription = ["PassPort Photo", "ID/License", "Other"];
   var pointdata;
@@ -129,8 +123,6 @@ class _AddProfileState extends State<AddProfile> {
           insurance: _insurance,
           location: _location,
           pictures: [],
-          paid: [],
-          due: [],
         );
         User user = FirebaseAuth.instance.currentUser;
         DocumentReference docRef =
@@ -169,8 +161,6 @@ class _AddProfileState extends State<AddProfile> {
           insurance: _insurance,
           location: _location,
           pictures: [],
-          paid: [],
-          due: [],
         );
         User user = FirebaseAuth.instance.currentUser;
         DocumentReference docRef =
@@ -550,7 +540,7 @@ class _AddProfileState extends State<AddProfile> {
     Navigator.pushReplacementNamed(context, "/");
   }
 
- uploadHealthPictures(bisID) async {
+  uploadHealthPictures(bisID) async {
     List<String> urlList = [];
     for (int i = 0; i < bisPictureFile.length; i++) {
       if (bisPictureFile[i] != null) {

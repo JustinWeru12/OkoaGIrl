@@ -1,7 +1,10 @@
 import 'package:okoagirl/constants/constants.dart';
 import 'package:okoagirl/pages/adminpanel.dart';
+import 'package:okoagirl/pages/casespage.dart';
 import 'package:okoagirl/pages/donate.dart';
+import 'package:okoagirl/pages/healthcases.dart';
 import 'package:okoagirl/pages/help.dart';
+import 'package:okoagirl/pages/lawcases.dart';
 import 'package:okoagirl/pages/profile.dart';
 import 'package:okoagirl/pages/report.dart';
 import 'package:okoagirl/services/authentication.dart';
@@ -36,7 +39,7 @@ class _SideBarState extends State<SideBar> {
   String _fullNames;
   String profilPicture;
   String image;
-  bool isDriver = false, isAdmin = false, isSeller = false;
+  bool isLegal = false, isAdmin = false, isHealth = false;
   @override
   void initState() {
     super.initState();
@@ -49,6 +52,8 @@ class _SideBarState extends State<SideBar> {
         _fullNames = dataMap['fullNames'];
         profilPicture = dataMap['picture'];
         isAdmin = dataMap['admin'];
+        isLegal = dataMap['isLegal'];
+        isHealth = dataMap['isHealth'];
       });
     });
   }
@@ -59,11 +64,11 @@ class _SideBarState extends State<SideBar> {
       child: Container(
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(0.0),
-            color: kBackgroundColor,
-            // image: DecorationImage(
-            //     image: AssetImage('assets/images/bg.png'), fit: BoxFit.cover),
-                ),
+          borderRadius: BorderRadius.circular(0.0),
+          color: kBackgroundColor,
+          // image: DecorationImage(
+          //     image: AssetImage('assets/images/bg.png'), fit: BoxFit.cover),
+        ),
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -134,7 +139,8 @@ class _SideBarState extends State<SideBar> {
                   isAdmin ? divider() : Container(),
                   isAdmin
                       ? ListTile(
-                          leading: Icon(Icons.admin_panel_settings_rounded, color: kTextColor),
+                          leading: Icon(Icons.admin_panel_settings_rounded,
+                              color: kTextColor),
                           title: Text('Admin',
                               style: TextStyle(fontWeight: FontWeight.bold)),
                           onTap: () => {
@@ -166,6 +172,29 @@ class _SideBarState extends State<SideBar> {
                       Navigator.of(context).pop(),
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) => DonatePage()))
+                    },
+                  ),
+                  divider(),
+                  ListTile(
+                    leading: Icon(Icons.book, color: kTextColor),
+                    title: Text('Cases',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    onTap: () => {
+                      Navigator.of(context).pop(),
+                      isHealth
+                          ? Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HealthCasesPage()))
+                          : isLegal
+                              ? Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => LawCasesPage()))
+                              : Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => CasesPage()))
                     },
                   ),
                   divider(),

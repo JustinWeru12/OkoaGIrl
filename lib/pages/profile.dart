@@ -296,14 +296,6 @@ class _ProfilePageState extends State<ProfilePage> {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            // Positioned.fill(
-            //   child: Container(
-            //     child: Image.asset(
-            //       'assets/images/bg.png',
-            //       fit: BoxFit.cover,
-            //     ),
-            //   ),
-            // ),
             Stack(
               children: <Widget>[
                 Align(
@@ -369,7 +361,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ],
             ),
-            _addButton(),
           ],
         ),
       ),
@@ -452,96 +443,6 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _addButton() {
-    return Container(
-      width: 300.0,
-      margin: EdgeInsets.only(top: 15),
-      child: isHealth
-          ? RaisedButton(
-              onPressed: () {},
-              padding: EdgeInsets.all(0),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(5.0))),
-              child: Container(
-                padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5.0),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [kPrimaryColor, kSecondaryColor],
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    "Already Registered ",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16.0),
-                  ),
-                ),
-              ),
-            )
-          : isLegal
-              ? RaisedButton(
-                  onPressed: () {},
-                  padding: EdgeInsets.all(0),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5.0))),
-                  child: Container(
-                    padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5.0),
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [kPrimaryColor, kSecondaryColor],
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        "Already Registered",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16.0),
-                      ),
-                    ),
-                  ),
-                )
-              : RaisedButton(
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => AddProfile()));
-                  },
-                  padding: EdgeInsets.all(0),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5.0))),
-                  child: Container(
-                    padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5.0),
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [kPrimaryColor, kSecondaryColor],
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        "Register \nLegal/Health ",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16.0),
-                      ),
-                    ),
-                  ),
-                ),
     );
   }
 

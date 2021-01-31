@@ -84,6 +84,13 @@ class CrudMethods {
     return ref.set(userDataMap, SetOptions(merge: true));
   }
 
+  updateCaseData(
+      id, Map<String, dynamic> userDataMap) async {
+    DocumentReference ref =
+        FirebaseFirestore.instance.collection('cases').doc(id);
+    return ref.set(userDataMap, SetOptions(merge: true));
+  }
+
   Future<void> createDonation(Map<String, dynamic> dataMap) async {
     FirebaseFirestore.instance
         .collection('donation')

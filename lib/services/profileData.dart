@@ -14,8 +14,6 @@ class ProfileData {
   final location;
   final bool isVerified;
   final List<dynamic> pictures;
-  final List<int> due;
-  final List<int> paid;
 
   ProfileData(
       {this.name,
@@ -32,8 +30,7 @@ class ProfileData {
       this.location,
       this.isVerified,
       this.makeModel,
-      this.pictures,
-      this.due, this.paid});
+      this.pictures});
 
   Map<String, dynamic> getProfileDataMap() {
     return {

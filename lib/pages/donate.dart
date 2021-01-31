@@ -141,7 +141,7 @@ class _DonatePageState extends State<DonatePage> {
     int _amount = tip * 100;
     var response = await StripeService.payWithNewCard(
       amount: _amount.toString(),
-      currency: 'GBP',
+      currency: 'KES',
     );
     if (response.success) {
       addDonation();
@@ -168,7 +168,7 @@ class _DonatePageState extends State<DonatePage> {
       expYear: int.parse(expiryArr[1]),
     );
     var response = await StripeService.payViaExistingCard(
-        amount: _amount.toString(), currency: 'GBP', card: stripeCard);
+        amount: _amount.toString(), currency: 'KES', card: stripeCard);
     if (response.success) {
       addDonation();
       showInSnackBar("Donation Made");
