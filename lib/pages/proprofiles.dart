@@ -483,7 +483,7 @@ class _ProfessionalProfilesState extends State<ProfessionalProfiles> {
                                                 context,
                                                 profileData,
                                                 snapshot.data.documents[i].id,
-                                                "lawyers",
+                                                "health",
                                                 {
                                                   "isVerified": !snapshot
                                                           .data.documents[i]
@@ -500,7 +500,7 @@ class _ProfessionalProfilesState extends State<ProfessionalProfiles> {
                                                     fontSize: 18.0)),
                                             subtitle: Text(
                                                 snapshot.data.documents[i]
-                                                    ["desc"],
+                                                    ["email"],
                                                 style: TextStyle(
                                                     color: Colors.black,
                                                     fontWeight:

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:geocoder/geocoder.dart' as Geocode;
 import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:location/location.dart';
 import 'package:okoagirl/constants/constants.dart';
@@ -32,6 +34,7 @@ class ReportPage extends StatefulWidget {
 class _ReportPageState extends State<ReportPage> {
   bool more = false, anonym = false;
   CrudMethods crudObj = new CrudMethods();
+  TextEditingController locController = TextEditingController();
   String greetingMes, _fullName = " ", image;
   bool isAdmin;
   String victimName,
@@ -40,12 +43,9 @@ class _ReportPageState extends State<ReportPage> {
       assailantName,
       relationship,
       crime,
-      persuing;
-  List<String> actions = [
-    "Legal Action",
-    "Therapy",
-    "Medical Attention"
-  ];
+      persuing,
+      tempLoc = 'Nyeri,Ke';
+  List<String> actions = ["Legal Action", "Therapy", "Medical Attention"];
 
   Location geolocation = new Location();
   Geoflutterfire geo = Geoflutterfire();
@@ -89,6 +89,13 @@ class _ReportPageState extends State<ReportPage> {
     locationsubs = geolocation.onLocationChanged.listen((LocationData cLoc) {
       setState(() {
         currentLocation = cLoc;
+      });
+    });
+    getUserLocation().then((val) {
+      setState(() {
+        tempLoc = val;
+        locController.text = val;
+        print(val);
       });
     });
     crudObj.getDataFromUserFromDocument().then((value) {
@@ -210,6 +217,31 @@ class _ReportPageState extends State<ReportPage> {
       showInSnackBar("Case Reported ");
       _formKey.currentState.reset();
     });
+  }
+
+  Future<String> getUserLocation() async {
+    LocationData myLocation;
+    String error;
+    Location location = new Location();
+    try {
+      myLocation = await location.getLocation();
+    } on PlatformException catch (e) {
+      if (e.code == 'PERMISSION_DENIED') {
+        error = 'please grant permission';
+        print(error);
+      }
+      if (e.code == 'PERMISSION_DENIED_NEVER_ASK') {
+        error = 'permission denied- please enable it from app settings';
+        print(error);
+      }
+      myLocation = null;
+    }
+    final coordinates =
+        new Geocode.Coordinates(myLocation.latitude, myLocation.longitude);
+    var addresses =
+        await Geocode.Geocoder.local.findAddressesFromCoordinates(coordinates);
+    var first = addresses.first;
+    return first.addressLine;
   }
 
   @override
@@ -409,6 +441,8 @@ class _ReportPageState extends State<ReportPage> {
                                         },
                                       ),
                                       TextFormField(
+                                        // initialValue: tempLoc,
+                                        controller: locController,
                                         decoration: InputDecoration(
                                             labelText: 'Location'),
                                         validator: (String value) {
@@ -589,7 +623,7 @@ class _ReportPageState extends State<ReportPage> {
   }
 
   Widget cases() {
-    var reported = 0, solved = 0,pending=0;
+    var reported = 0, solved = 0, pending = 0;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -622,7 +656,10 @@ class _ReportPageState extends State<ReportPage> {
                   );
                 }),
             StreamBuilder(
-                stream: FirebaseFirestore.instance.collection('cases').where("solved",isEqualTo: true).snapshots(),
+                stream: FirebaseFirestore.instance
+                    .collection('cases')
+                    .where("solved", isEqualTo: true)
+                    .snapshots(),
                 builder: (context, snapshot) {
                   solved =
                       snapshot.hasData ? snapshot.data.documents.length : 0;
@@ -633,17 +670,19 @@ class _ReportPageState extends State<ReportPage> {
                   );
                 }),
             StreamBuilder(
-              stream: FirebaseFirestore.instance.collection('cases').where("solved",isEqualTo: false).snapshots(),
-              builder: (context, snapshot) {
-                pending =
+                stream: FirebaseFirestore.instance
+                    .collection('cases')
+                    .where("solved", isEqualTo: false)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  pending =
                       snapshot.hasData ? snapshot.data.documents.length : 0;
-                return Counter(
-                  color: kDeathColor,
-                  number: pending,
-                  title: "In Progress",
-                );
-              }
-            ),
+                  return Counter(
+                    color: kDeathColor,
+                    number: pending,
+                    title: "In Progress",
+                  );
+                }),
           ],
         ),
       ),
