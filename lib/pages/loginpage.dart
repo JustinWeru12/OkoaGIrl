@@ -43,10 +43,10 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
   double offset = 0;
   String _authHint = '';
   FormType _formType = FormType.login;
-  String _password, phoneNo, verificationId, smsCode;
+  String _password, phoneNo = "", verificationId, smsCode;
   bool _isLoading = false, codeSent = false;
   Color dobColor = kSecondaryColor;
-  String _licensceNo, _location, _phone, _idNo, _bio, _insurance;
+  String _licensceNo, _location, _phone = "", _idNo, _bio, _insurance;
   List<File> bisPictureFile = new List<File>(3);
   List photoDescription = ["PassPort Photo", "ID/License", "Other"];
   bool isLaw = true, isHealth = false;
@@ -71,78 +71,75 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
   }
 
   void validateAndRegisterLaw() async {
+    List pics = [];
     if (validateAndSave()) {
       setState(() {
         _isLoading = true;
       });
-      ProfileData bisData = new ProfileData(
-        name: _fullNames,
-        bio: _bio,
-        idNo: _idNo,
-        phone: _phone,
-        email: _email,
-        licenseNo: _licensceNo,
-        insurance: _insurance,
-        location: _location,
-        pictures: [],
-      );
       User user = FirebaseAuth.instance.currentUser;
       DocumentReference docRef =
           FirebaseFirestore.instance.collection('lawyers').doc(user.uid);
-      uploadLawPictures(docRef.id);
-      return docRef
-          .set(bisData.getProfileDataMap(), SetOptions(merge: true))
-          .whenComplete(() => {
-                crudObj.createOrUpdateUserData({'isLegal': true}),
-                widget.loginCallback()
-              });
-
-//      setState(() {
-//        _isLoading = false;
-//      });
-
-    } else {
-//      setState(() {
-//        _authHint = '';
-//      });
+      uploadLawPictures(docRef.id).then((val) {
+        ProfileData bisData = new ProfileData(
+          name: _fullNames,
+          bio: _bio,
+          idNo: _idNo,
+          phone: _phone,
+          email: _email,
+          licenseNo: _licensceNo,
+          insurance: _insurance,
+          location: _location,
+          pictures: val,
+        );
+        setState(() {
+          pics = val;
+          crudObj.updateLawPictures(val, user.uid);
+          crudObj.createOrUpdateUserData({'isLegal': true});
+        });
+        docRef
+            .set(bisData.getProfileDataMap(), SetOptions(merge: true))
+            .whenComplete(() => {
+                  crudObj.createOrUpdateUserData({'isLegal': true}),
+                  widget.loginCallback()
+                });
+      });
     }
   }
 
   void validateAndRegisterHealth() async {
+    var pics = [];
     if (validateAndConfirm()) {
       setState(() {
         _isLoading = true;
       });
-      ProfileData bisData = new ProfileData(
-        name: _fullNames,
-        bio: _bio,
-        idNo: _idNo,
-        phone: _phone,
-        email: _email,
-        licenseNo: _licensceNo,
-        insurance: _insurance,
-        location: _location,
-        pictures: [],
-      );
       User user = FirebaseAuth.instance.currentUser;
       DocumentReference docRef =
           FirebaseFirestore.instance.collection('health').doc(user.uid);
-      uploadHealthPictures(docRef.id);
-      return docRef
-          .set(bisData.getProfileDataMap(), SetOptions(merge: true))
-          .whenComplete(() => {
-                crudObj.createOrUpdateUserData({'isHealth': true}),
-                widget.loginCallback()
-              });
-
-//      setState(() {
-//        _isLoading = false;
-//      });
-
-    } else {
-//      setState(() {
-//        _authHint = '';
-//      });
+      uploadHealthPictures(docRef.id).then((val) {
+        ProfileData bisData = new ProfileData(
+          name: _fullNames,
+          bio: _bio,
+          idNo: _idNo,
+          phone: _phone,
+          email: _email,
+          licenseNo: _licensceNo,
+          insurance: _insurance,
+          location: _location,
+          pictures: val,
+        );
+        setState(() {
+          debugPrint(val.toString());
+          crudObj.updateHealthPictures(val, user.uid);
+          pics = val;
+          crudObj.createOrUpdateUserData({'isHealth': true});
+        });
+        docRef
+            .set(bisData.getProfileDataMap(), SetOptions(merge: true))
+            .whenComplete(() => {
+                  crudObj.createOrUpdateUserData({'isHealth': true}),
+                  widget.loginCallback()
+                });
+      });
     }
   }
 
@@ -166,7 +163,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
     }
   }
 
-  uploadLawPictures(bisID) async {
+  Future<List<String>> uploadLawPictures(bisID) async {
     List<String> urlList = [];
     for (int i = 0; i < bisPictureFile.length; i++) {
       if (bisPictureFile[i] != null) {
@@ -183,17 +180,10 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
     setState(() {
       _isLoading = false;
     });
-    updatePictures(urlList, bisID);
+    return urlList;
   }
 
-  updatePictures(picUrlList, bisID) {
-    FirebaseFirestore.instance
-        .collection('lawyers')
-        .doc(bisID)
-        .update({"pictures": picUrlList});
-  }
-
-  uploadHealthPictures(bisID) async {
+  Future<List<String>> uploadHealthPictures(bisID) async {
     List<String> urlList = [];
     for (int i = 0; i < bisPictureFile.length; i++) {
       if (bisPictureFile[i] != null) {
@@ -206,17 +196,11 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
         urlList.add(url);
       }
     }
+    // updateHealthPictures(urlList, bisID);
     setState(() {
       _isLoading = false;
     });
-    updateHealthPictures(urlList, bisID);
-  }
-
-  updateHealthPictures(picUrlList, bisID) {
-    FirebaseFirestore.instance
-        .collection('health')
-        .doc(bisID)
-        .update({"pictures": picUrlList});
+    return urlList;
   }
 
   // Perform login or signup
@@ -239,7 +223,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
           UserData userData = new UserData(
             fullNames: _fullNames,
             email: _email,
-            phone: "",
+            phone: _phone,
             picture:
                 "https://firebasestorage.googleapis.com/v0/b/nightlyfe-9fe92.appspot.com/o/private%2Fhome.png?alt=media&token=900267d4-25d9-4144-b7de-53b3f559804d",
             isHealth: false,
@@ -251,7 +235,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
           UserData userData = new UserData(
             fullNames: _fullNames,
             email: _email,
-            phone: phoneNo,
+            phone: _phone,
             picture:
                 "https://firebasestorage.googleapis.com/v0/b/nightlyfe-9fe92.appspot.com/o/private%2Fhome.png?alt=media&token=900267d4-25d9-4144-b7de-53b3f559804d",
             isHealth: isHealth,
@@ -467,44 +451,6 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
             return 'Passwords don\'t correspond';
           }
           return null;
-        },
-      ),
-    );
-  }
-
-  Widget _buildPhoneField() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 10.0, 0.0),
-      child: TextFormField(
-        maxLines: 1,
-        initialValue: '+254',
-        keyboardType: TextInputType.number,
-        key: new Key('phone'),
-        decoration: InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(15.0, 0.0, 10.0, 0.0),
-          labelText: 'Phone',
-          hintText: '+254700000000',
-          hintStyle: kSubTextStyle,
-          labelStyle: kSubTextStyle,
-          prefixIcon: new Icon(
-            Icons.phone,
-            color: kSecondaryColor,
-          ),
-          border: new OutlineInputBorder(
-            borderRadius: new BorderRadius.circular(42),
-            borderSide: new BorderSide(),
-          ),
-          filled: true,
-          fillColor: kBackgroundColor.withOpacity(0.75),
-        ),
-        validator: (value) {
-          if (value.isEmpty || value.length < 10) {
-            return 'Enter a valid Phone Number';
-          }
-          return null;
-        },
-        onSaved: (value) {
-          phoneNo = value;
         },
       ),
     );
@@ -735,7 +681,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
                   width: 250,
                   height: 200,
                   child: bisPictureFile[index] == null
-                      ? FlatButton(
+                      ? TextButton(
                           onPressed: () {
                             getImageFromGallery(index);
                           },
@@ -796,7 +742,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  FlatButton(
+                  TextButton(
                     child: new Text(
                       "Ok",
                       style: TextStyle(color: Colors.blue),
@@ -828,14 +774,14 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
               onPressed: validateAndSubmit,
             ),
             SizedBox(height: 10.0),
-            FlatButton(
+            TextButton(
                 key: new Key('reset-account'),
                 child: Text(
                   "Reset Password",
                 ),
                 onPressed: moveToReset),
             // SizedBox(height: 10),
-            FlatButton(
+            TextButton(
                 key: new Key('need-account'),
                 child: Text("Create a New Account"),
                 onPressed: moveToRegister),
@@ -862,7 +808,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
                   }
                 }),
             SizedBox(height: 20.0),
-            FlatButton(
+            TextButton(
                 key: new Key('need-login'),
                 child: Text("Already Have an Account ? Login"),
                 onPressed: moveToLogin),
@@ -887,7 +833,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
                   }
                 }),
             SizedBox(height: 20.0),
-            FlatButton(
+            TextButton(
                 key: new Key('need-login'),
                 child: Text(
                   "Use Different Account",
@@ -910,12 +856,12 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
               onPressed: validateAndSubmit,
             ),
             SizedBox(height: 10.0),
-            FlatButton(
+            TextButton(
                 key: new Key('need-login'),
                 child: Text("Already Have an Account ? Login"),
                 onPressed: moveToLogin),
             SizedBox(height: 10.0),
-            FlatButton(
+            TextButton(
                 key: new Key('need-pro'),
                 child: Text("Pro account"),
                 onPressed: moveToPro),
@@ -984,6 +930,12 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
             SizedBox(
               height: 5.0,
             ),
+            _formType == FormType.pro ? _bisBio() : Container(),
+            _formType == FormType.pro ? _toggle() : Container(),
+            _formType == FormType.pro ? _bisId() : Container(),
+            _formType == FormType.register || _formType == FormType.pro
+                ? _bisPhone()
+                : Container(),
             _formType != FormType.reset ? _buildPasswordField() : Container(),
             SizedBox(
               height: 5.0,
@@ -991,10 +943,6 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
             _formType == FormType.register || _formType == FormType.pro
                 ? _builConfirmPasswordTextField()
                 : Container(),
-            _formType == FormType.pro ? _bisBio() : Container(),
-            _formType == FormType.pro ? _toggle() : Container(),
-            _formType == FormType.pro ? _bisId() : Container(),
-            _formType == FormType.pro ? _bisPhone() : Container(),
             _formType == FormType.pro ? _bisLicense() : Container(),
             _formType == FormType.pro ? _bisInsurance() : Container(),
             _formType == FormType.pro ? _selectionPictures() : Container(),

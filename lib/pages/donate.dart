@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:okoagirl/constants/constants.dart';
 import 'package:okoagirl/models/counter.dart';
+import 'package:okoagirl/pages/budgetpage.dart';
+import 'package:okoagirl/pages/donationspage.dart';
 import 'package:okoagirl/pages/sidebar.dart';
 import 'package:okoagirl/services/authentication.dart';
 import 'package:okoagirl/services/crud.dart';
@@ -74,7 +76,7 @@ class _DonatePageState extends State<DonatePage> {
   }
 
   showInSnackBar(value) {
-    _scaffoldKey.currentState.showSnackBar(new SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(new SnackBar(
       content: new Text(
         value,
         style: TextStyle(fontSize: 20, color: Colors.white),
@@ -117,7 +119,7 @@ class _DonatePageState extends State<DonatePage> {
 
   addDonation() {
     Map<String, dynamic> budgetData = {
-      "name": _fullName,
+      "name": !anonym ? _fullName : "Anonymous",
       "amount": tip,
       "desc": '',
     };
@@ -127,7 +129,8 @@ class _DonatePageState extends State<DonatePage> {
         ..addAll([tip]));
     });
 
-    crudObj.createDonation(budgetData);
+    crudObj.createDonation(
+        budgetData, DateTime.now().millisecondsSinceEpoch.toString());
   }
 
   Future<String> getCurrentUID() async {
@@ -148,7 +151,7 @@ class _DonatePageState extends State<DonatePage> {
       showInSnackBar("Donation Made");
     }
     await dialog.hide();
-    _scaffoldKey.currentState.showSnackBar(SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(response.message),
       duration:
           new Duration(milliseconds: response.success == true ? 1200 : 3000),
@@ -174,7 +177,7 @@ class _DonatePageState extends State<DonatePage> {
       showInSnackBar("Donation Made");
     }
     await dialog.hide();
-    _scaffoldKey.currentState.showSnackBar(SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(response.message),
       duration: new Duration(milliseconds: 1200),
     ));
@@ -202,17 +205,20 @@ class _DonatePageState extends State<DonatePage> {
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
                         children: [
-                          RaisedButton(
+                          ElevatedButton(
                             onPressed: () {
                               Navigator.of(context).pop();
                               payViaNewCard(context).then((val) {
                                 if (val) {}
                               });
                             },
-                            padding: EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 0.0),
-                            shape: new RoundedRectangleBorder(
-                                borderRadius: new BorderRadius.circular(20.0)),
-                            color: kSecondaryColor,
+                            style: ElevatedButton.styleFrom(
+                                padding:
+                                    EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 0.0),
+                                shape: new RoundedRectangleBorder(
+                                    borderRadius:
+                                        new BorderRadius.circular(20.0)),
+                                primary: kSecondaryColor),
                             child: Padding(
                               padding: EdgeInsets.all(10.0),
                               child: Text(
@@ -225,15 +231,18 @@ class _DonatePageState extends State<DonatePage> {
                             ),
                           ),
                           Spacer(),
-                          RaisedButton(
+                          ElevatedButton(
                             onPressed: () {
                               Navigator.of(context).pop();
                               openCardSheet(context);
                             },
-                            shape: new RoundedRectangleBorder(
-                                borderRadius: new BorderRadius.circular(20.0)),
-                            color: kSecondaryColor,
-                            padding: EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 0.0),
+                            style: ElevatedButton.styleFrom(
+                                shape: new RoundedRectangleBorder(
+                                    borderRadius:
+                                        new BorderRadius.circular(20.0)),
+                                primary: kSecondaryColor,
+                                padding:
+                                    EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 0.0)),
                             child: Padding(
                               padding: EdgeInsets.all(10.0),
                               child: Text(
@@ -521,7 +530,7 @@ class _DonatePageState extends State<DonatePage> {
                                         fontFamily: "HelveticaNeueCyr",
                                         fontSize: 17),
                               ),
-                              FlatButton(
+                              TextButton(
                                   onPressed: () {
                                     setState(() {
                                       more = !more;
@@ -607,7 +616,7 @@ class _DonatePageState extends State<DonatePage> {
                               }),
                         ),
                         customTip ? _buildTipField() : Container(),
-                        FlatButton(
+                        TextButton(
                             onPressed: () {
                               setState(() {
                                 anonym = !anonym;
@@ -637,11 +646,14 @@ class _DonatePageState extends State<DonatePage> {
                               ],
                             )),
                         Center(
-                          child: RaisedButton(
-                            elevation: 5.0,
-                            shape: new RoundedRectangleBorder(
-                                borderRadius: new BorderRadius.circular(20.0)),
-                            color: kSecondaryColor,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              elevation: 5.0,
+                              shape: new RoundedRectangleBorder(
+                                  borderRadius:
+                                      new BorderRadius.circular(20.0)),
+                              primary: kSecondaryColor,
+                            ),
                             child: Text("Donate",
                                 style: TextStyle(
                                     fontSize: 20,
@@ -748,15 +760,29 @@ class _DonatePageState extends State<DonatePage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Counter(
-                  color: kInfectedColor,
-                  number: budget ?? 0,
-                  title: "Budget",
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => BudgetPage()));
+                  },
+                  child: Counter(
+                    color: kInfectedColor,
+                    number: budget ?? 0,
+                    title: "Budget",
+                  ),
                 ),
-                Counter(
-                  color: kDeathColor,
-                  number: !snapshot.hasError ? donation : 0,
-                  title: "Donations",
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => DonationsPage()));
+                  },
+                  child: Counter(
+                    color: kDeathColor,
+                    number: !snapshot.hasError ? donation : 0,
+                    title: "Donations",
+                  ),
                 ),
                 Counter(
                   color: kRecovercolor,

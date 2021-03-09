@@ -64,40 +64,32 @@ class CrudMethods {
     });
   }
 
-  Future<void> createBudget(Map<String, dynamic> dataMap) async {
-    FirebaseFirestore.instance
-        .collection('budget')
-        .add(dataMap)
-        .catchError((e) {
-      print(e);
-    });
+  Future<void> createBudget(Map<String, dynamic> dataMap, id) async {
+    DocumentReference ref =
+        FirebaseFirestore.instance.collection('budget').doc(id);
+    return ref.set(dataMap, SetOptions(merge: true));
   }
 
   deleteBudget(docID) {
     return FirebaseFirestore.instance.collection('budget').doc(docID).delete();
   }
 
-  createOrUpdateProData(
-      id, collname, Map<String, dynamic> userDataMap) async {
+  createOrUpdateProData(id, collname, Map<String, dynamic> userDataMap) async {
     DocumentReference ref =
         FirebaseFirestore.instance.collection(collname).doc(id);
     return ref.set(userDataMap, SetOptions(merge: true));
   }
 
-  updateCaseData(
-      id, Map<String, dynamic> userDataMap) async {
+  updateCaseData(id, Map<String, dynamic> userDataMap) async {
     DocumentReference ref =
         FirebaseFirestore.instance.collection('cases').doc(id);
     return ref.set(userDataMap, SetOptions(merge: true));
   }
 
-  Future<void> createDonation(Map<String, dynamic> dataMap) async {
-    FirebaseFirestore.instance
-        .collection('donation')
-        .add(dataMap)
-        .catchError((e) {
-      print(e);
-    });
+  Future<void> createDonation(Map<String, dynamic> dataMap, id) async {
+    DocumentReference ref =
+        FirebaseFirestore.instance.collection('donation').doc(id);
+    return ref.set(dataMap, SetOptions(merge: true));
   }
 
   getBudget() async {
@@ -117,6 +109,18 @@ class CrudMethods {
     DocumentReference ref =
         FirebaseFirestore.instance.collection("finances").doc("budget");
     return ref.set({"donations": data}, SetOptions(merge: true));
+  }
+
+  updateLawPictures(List<String> picUrlList, bisID) {
+    DocumentReference ref =
+        FirebaseFirestore.instance.collection('lawyers').doc(bisID);
+    return ref.set({"pictures": picUrlList}, SetOptions(merge: true));
+  }
+
+  updateHealthPictures(List<String> picUrlList, bisID) {
+    DocumentReference ref =
+        FirebaseFirestore.instance.collection('health').doc(bisID);
+    return ref.set({"pictures": picUrlList}, SetOptions(merge: true));
   }
 
   createOrUpdateCardData(Map<String, dynamic> userDataMap) async {

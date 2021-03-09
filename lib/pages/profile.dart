@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:okoagirl/constants/constants.dart';
-import 'package:okoagirl/pages/addItems.dart';
+// import 'package:okoagirl/pages/addItems.dart';
 import 'package:okoagirl/pages/faq_page.dart';
 import 'package:okoagirl/pages/help.dart';
 import 'package:okoagirl/pages/paymentpage.dart';
@@ -143,11 +143,13 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: RaisedButton(
-                              color: kPrimaryColor,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(20.0))),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                primary: kPrimaryColor,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(20.0))),
+                              ),
                               child: Text(
                                 "Validate",
                                 style: TextStyle(color: Colors.black),
@@ -218,11 +220,13 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: RaisedButton(
-                              color: kPrimaryColor,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(20.0))),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                primary: kPrimaryColor,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(20.0))),
+                              ),
                               child: Text(
                                 "Validate",
                                 style: TextStyle(color: Colors.black),

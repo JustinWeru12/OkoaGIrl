@@ -14,7 +14,7 @@ class _LawCasesPageState extends State<LawCasesPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   showInSnackBar(value) {
-    _scaffoldKey.currentState.showSnackBar(new SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(new SnackBar(
       content: new Text(
         value,
         style: TextStyle(fontSize: 20, color: Colors.white),
@@ -61,7 +61,7 @@ class _LawCasesPageState extends State<LawCasesPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  FlatButton(
+                  TextButton(
                     child: new Text(
                       "Ok",
                       style: TextStyle(
@@ -74,7 +74,7 @@ class _LawCasesPageState extends State<LawCasesPage> {
                     },
                   ),
                   Spacer(),
-                  FlatButton(
+                  TextButton(
                     child: new Text(
                       "Cancel",
                       style: TextStyle(

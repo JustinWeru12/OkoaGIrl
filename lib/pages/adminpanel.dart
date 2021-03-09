@@ -40,11 +40,12 @@ class _AdminPanelState extends State<AdminPanel> {
         ..addAll([budgetAmt]));
     });
 
-    crudObj.createBudget(budgetData);
+    crudObj.createBudget(
+        budgetData, DateTime.now().millisecondsSinceEpoch.toString());
   }
 
   showInSnackBar(value) {
-    _scaffoldKey.currentState.showSnackBar(new SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(new SnackBar(
       content: new Text(
         value,
         style: TextStyle(fontSize: 20, color: Colors.white),
@@ -216,12 +217,14 @@ class _AdminPanelState extends State<AdminPanel> {
           child: Row(
             children: [
               Expanded(
-                child: RaisedButton(
+                child: ElevatedButton(
                   onPressed: () {
                     addAdmin(context);
                   },
-                  padding: EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
-                  color: kSecondaryColor,
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
+                    primary: kSecondaryColor,
+                  ),
                   child: Center(
                     child: Padding(
                       padding: EdgeInsets.all(10.0),
@@ -440,16 +443,18 @@ class _AdminPanelState extends State<AdminPanel> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: RaisedButton(
-                      color: Theme.of(context).accentColor,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0)),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: Theme.of(context).accentColor,
+                        textStyle: TextStyle(color: Colors.white),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0)),
+                      ),
                       child: Text(
                         'Add Admin',
                         style: TextStyle(
                             fontSize: 15.0, fontWeight: FontWeight.bold),
                       ),
-                      textColor: Colors.white,
                       onPressed: () {
                         String _email = email.text.toString();
                         if (_formKey.currentState.validate()) {
@@ -788,17 +793,20 @@ class _AdminPanelState extends State<AdminPanel> {
                               )),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: RaisedButton(
-                                color: Theme.of(context).accentColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20.0)),
+                            child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  primary: Theme.of(context).accentColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(20.0)),
+                                ),
                                 child: Text(
                                   'Add Item',
                                   style: TextStyle(
                                       fontSize: 15.0,
+                                      color: Colors.white,
                                       fontWeight: FontWeight.bold),
                                 ),
-                                textColor: Colors.white,
                                 onPressed: () {
                                   if (_formKey.currentState.validate()) {
                                     _formKey.currentState.save();

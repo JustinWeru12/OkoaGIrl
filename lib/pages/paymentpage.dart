@@ -36,7 +36,7 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   showInSnackBar(value) {
-    _scaffoldKey.currentState.showSnackBar(new SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(new SnackBar(
       content: new Text(
         value,
         style: TextStyle(fontSize: 20, color: Colors.white),

@@ -15,14 +15,15 @@ class PrimaryButton extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
       child: SizedBox(
         height: 40.0,
-        child: RaisedButton(
-            elevation: 5.0,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30.0)),
+        child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                primary: kSecondaryColor,
+                textStyle: TextStyle(color: Colors.black87),
+                elevation: 5.0,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0))),
             child: Text(text,
                 style: TextStyle(color: Colors.white, fontSize: 20.0)),
-            color: kSecondaryColor,
-            textColor: Colors.black87,
             onPressed: onPressed),
       ),
     );

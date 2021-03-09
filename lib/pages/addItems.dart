@@ -241,7 +241,7 @@ class _AddProfileState extends State<AddProfile> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  FlatButton(
+                  TextButton(
                     child: new Text(
                       "Ok",
                       style: TextStyle(color: Colors.blue),
@@ -443,7 +443,7 @@ class _AddProfileState extends State<AddProfile> {
                   width: 250,
                   height: 200,
                   child: bisPictureFile[index] == null
-                      ? FlatButton(
+                      ? TextButton(
                           onPressed: () {
                             getImageFromGallery(index);
                           },
@@ -588,7 +588,7 @@ class _AddProfileState extends State<AddProfile> {
                   width: 250,
                   height: 200,
                   child: bisPictureFile[index] == null
-                      ? FlatButton(
+                      ? TextButton(
                           onPressed: () {
                             getBisImageFromGallery(index);
                           },

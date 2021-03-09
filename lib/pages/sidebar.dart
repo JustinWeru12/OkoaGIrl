@@ -152,17 +152,21 @@ class _SideBarState extends State<SideBar> {
                           },
                         )
                       : Container(),
-                  divider(),
-                  ListTile(
-                    leading: Icon(Icons.report, color: kTextColor),
-                    title: Text('Report',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    onTap: () => {
-                      Navigator.of(context).pop(),
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => ReportPage()))
-                    },
-                  ),
+                  isHealth || isLegal ? Container() : divider(),
+                  isHealth || isLegal
+                      ? Container()
+                      : ListTile(
+                          leading: Icon(Icons.report, color: kTextColor),
+                          title: Text('Report',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          onTap: () => {
+                            Navigator.of(context).pop(),
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ReportPage()))
+                          },
+                        ),
                   divider(),
                   ListTile(
                     leading: Icon(Icons.monetization_on, color: kTextColor),

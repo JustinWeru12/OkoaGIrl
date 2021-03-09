@@ -68,16 +68,17 @@ class _SelectProfilPictureState extends State<SelectProfilPicture> {
           _isLoading == false
               ? Container(
                   margin: EdgeInsets.only(top: 10.0),
-                  child: RaisedButton(
-                    elevation: 5.0,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0)),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      elevation: 5.0,
+                      primary: Color(0xFFe0fcdf),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0)),
+                    ),
                     child: Icon(
                       Icons.done,
                       color: Color(0xFF0fbc00),
                     ),
-                    color: Color(0xFFe0fcdf),
-                    textColor: Colors.black87,
                     onPressed: uploadImage,
                   ),
                 )
@@ -109,10 +110,12 @@ class _SelectProfilPictureState extends State<SelectProfilPicture> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              RaisedButton(
-                elevation: 5.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  elevation: 5.0,
+                  primary: Color(0xFFe0fcdf),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0)),
                 ),
                 child: Column(
                   children: <Widget>[
@@ -123,17 +126,17 @@ class _SelectProfilPictureState extends State<SelectProfilPicture> {
                     Text('Gallery')
                   ],
                 ),
-                color: Color(0xFFebdffc),
-                textColor: Colors.black87,
                 onPressed: getImageFromGallery,
               ),
               SizedBox(
                 width: 25,
               ),
-              RaisedButton(
-                elevation: 5.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  elevation: 5.0,
+                  primary: Color(0xFFe0fcdf),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0)),
                 ),
                 child: Column(
                   children: <Widget>[
@@ -141,12 +144,9 @@ class _SelectProfilPictureState extends State<SelectProfilPicture> {
                       Icons.camera_alt,
                       color: Color(0xFF008793),
                     ),
-                    
                     Text('Camera')
                   ],
                 ),
-                color: Color(0xFFebdffc),
-                textColor: Colors.black87,
                 onPressed: getImageFromCamera,
               ),
             ],

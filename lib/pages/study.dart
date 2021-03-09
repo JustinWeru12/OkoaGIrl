@@ -34,7 +34,7 @@ class StudyPage extends StatefulWidget {
 }
 
 class _StudyPageState extends State<StudyPage> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  // final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   BitmapDescriptor solvedLocationIcon, unsolvedLocationIcon;
   Set<Marker> _markers = {};
   Completer<GoogleMapController> _controller = Completer();
@@ -46,7 +46,7 @@ class _StudyPageState extends State<StudyPage> {
   PermissionStatus _permissionGranted;
   LocationData currentLocation;
   StreamSubscription<LocationData> locationsubs;
-  List<LatLng> latLng = List<LatLng>();
+  // List<LatLng> latLng = List<LatLng>();
   double radius = 100.0;
   double zoomSize = 15;
   double tiltAngle = 80;
@@ -136,7 +136,7 @@ class _StudyPageState extends State<StudyPage> {
   }
 
   showInSnackBar(value) {
-    _scaffoldKey.currentState.showSnackBar(new SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(new SnackBar(
       content: new Text(
         value,
         style: TextStyle(fontSize: 20, color: Colors.white),

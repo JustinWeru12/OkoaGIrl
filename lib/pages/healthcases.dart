@@ -14,7 +14,7 @@ class _HealthCasesPageState extends State<HealthCasesPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   showInSnackBar(value) {
-    _scaffoldKey.currentState.showSnackBar(new SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(new SnackBar(
       content: new Text(
         value,
         style: TextStyle(fontSize: 20, color: Colors.white),
@@ -61,20 +61,20 @@ class _HealthCasesPageState extends State<HealthCasesPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  FlatButton(
+                  TextButton(
                     child: new Text(
                       "Ok",
                       style: TextStyle(
                           color: Colors.blue, fontWeight: FontWeight.w600),
                     ),
                     onPressed: () {
-                      crudObj.updateCaseData(id,{"solved":true});
+                      crudObj.updateCaseData(id, {"solved": true});
                       Navigator.of(context).pop();
                       showInSnackBar("Solved");
                     },
                   ),
                   Spacer(),
-                  FlatButton(
+                  TextButton(
                     child: new Text(
                       "Cancel",
                       style: TextStyle(
@@ -140,7 +140,8 @@ class _HealthCasesPageState extends State<HealthCasesPage> {
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
-                                  child: ListTile( onTap: () {
+                                  child: ListTile(
+                                    onTap: () {
                                       showInSnackBar("LongPress to Complete");
                                     },
                                     onLongPress: () {

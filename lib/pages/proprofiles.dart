@@ -20,7 +20,7 @@ class _ProfessionalProfilesState extends State<ProfessionalProfiles> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   showInSnackBar(value) {
-    _scaffoldKey.currentState.showSnackBar(new SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(new SnackBar(
       content: new Text(
         value,
         style: TextStyle(fontSize: 20, color: Colors.white),
@@ -72,7 +72,7 @@ class _ProfessionalProfilesState extends State<ProfessionalProfiles> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  FlatButton(
+                  TextButton(
                     child: new Text(
                       "Ok",
                       style: TextStyle(
@@ -88,7 +88,7 @@ class _ProfessionalProfilesState extends State<ProfessionalProfiles> {
                     },
                   ),
                   Spacer(),
-                  FlatButton(
+                  TextButton(
                     child: new Text(
                       "Cancel",
                       style: TextStyle(
@@ -202,17 +202,20 @@ class _ProfessionalProfilesState extends State<ProfessionalProfiles> {
                         Center(
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: RaisedButton(
-                                color: Theme.of(context).accentColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20.0)),
+                            child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  primary: Theme.of(context).accentColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(20.0))),
+                                ),
                                 child: Text(
                                   user.isVerified ? "Unverify" : 'Verify',
                                   style: TextStyle(
                                       fontSize: 15.0,
+                                      color: Colors.white,
                                       fontWeight: FontWeight.bold),
                                 ),
-                                textColor: Colors.white,
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                   _showDialogVerify(id, coll, val, user.email,

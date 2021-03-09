@@ -50,4 +50,21 @@ class ProfileData {
       "pictures": pictures,
     };
   }
+
+  factory ProfileData.fromJson(Map<String, dynamic> map) => ProfileData(
+        name: map["name"],
+        bio: map["bio"],
+        kraPin: map["kraPin"],
+        idNo: map["idNo"],
+        phone: map["phone"],
+        licenseNo: map["licenseNo"],
+        email: map["email"],
+        scanId: map["scanId"],
+        address: map["address"],
+        scanLicense: map["scanLicense"],
+        insurance: map["insurance"],
+        location: map["location"],
+        isVerified: map["isVerified"],
+        pictures: map["pictures"],
+      );
 }

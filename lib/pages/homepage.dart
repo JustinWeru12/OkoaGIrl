@@ -235,7 +235,7 @@ class _HomePageState extends State<HomePage> {
             return Container(
                 height: MediaQuery.of(context).size.height * 0.45,
                 width: MediaQuery.of(context).size.width,
-                margin: EdgeInsets.only(top: 10.0,left:10,right: 10),
+                margin: EdgeInsets.only(top: 10.0, left: 10, right: 10),
                 child: Stack(
                   children: [
                     ClipRRect(
@@ -274,11 +274,13 @@ class _HomePageState extends State<HomePage> {
             ),
             Container(
               height: 40.0,
-              child: new RaisedButton(
-                elevation: 5.0,
-                shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(20.0)),
-                color: kSecondaryColor,
+              child: new ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  elevation: 5.0,
+                  shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(20.0)),
+                  primary: kSecondaryColor,
+                ),
                 child: Text(title,
                     style: TextStyle(
                         fontSize: 20,

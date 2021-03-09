@@ -47,7 +47,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-    Widget _showLogo() {
+  Widget _showLogo() {
     return Padding(
         padding: EdgeInsets.only(top: 20.0),
         child: Container(
@@ -199,12 +199,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         padding: const EdgeInsets.all(8.0),
                         child: SizedBox(
                           width: _currentPage == _numPages - 1 ? 170 : 60,
-                          child: RaisedButton(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 10.0, horizontal: 8.0),
-                            elevation: 5.0,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(50.0)),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 10.0, horizontal: 8.0),
+                                elevation: 5.0,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(50.0))),
                             onPressed: () {
                               if (_currentPage == _numPages - 1) {
                                 setDone();

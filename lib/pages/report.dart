@@ -151,7 +151,7 @@ class _ReportPageState extends State<ReportPage> {
   static final _formKey = new GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   showInSnackBar(value) {
-    _scaffoldKey.currentState.showSnackBar(new SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(new SnackBar(
       content: new Text(
         value,
         style: TextStyle(fontSize: 20, color: Colors.white),
@@ -347,7 +347,7 @@ class _ReportPageState extends State<ReportPage> {
                                         fontFamily: "HelveticaNeueCyr",
                                         fontSize: 17),
                               ),
-                              FlatButton(
+                              TextButton(
                                   onPressed: () {
                                     setState(() {
                                       more = !more;
@@ -568,7 +568,7 @@ class _ReportPageState extends State<ReportPage> {
                             ),
                           ),
                         ),
-                        FlatButton(
+                        TextButton(
                             onPressed: () {
                               setState(() {
                                 anonym = !anonym;
@@ -598,11 +598,14 @@ class _ReportPageState extends State<ReportPage> {
                               ],
                             )),
                         Center(
-                          child: RaisedButton(
-                            elevation: 5.0,
-                            shape: new RoundedRectangleBorder(
-                                borderRadius: new BorderRadius.circular(20.0)),
-                            color: kSecondaryColor,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              primary: kSecondaryColor,
+                              elevation: 5.0,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20.0))),
+                            ),
                             child: Text("Report",
                                 style: TextStyle(
                                     fontSize: 20,
